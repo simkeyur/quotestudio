@@ -353,6 +353,7 @@ const PreviewCard = forwardRef(({ config }, ref) => {
                       <img
                         src={avatarSvg}
                         alt="Avatar"
+                        crossOrigin="anonymous"
                         style={{
                           transform: `scale(${avatarZoom / 100}) translate(${avatarOffsetX}%, ${avatarOffsetY}%)`,
                           transformOrigin: 'center center',
@@ -361,17 +362,14 @@ const PreviewCard = forwardRef(({ config }, ref) => {
                       />
                     ) : (
                       <img
-                        src={avatarUrl}
+                        src={avatarUrl || 'defaults/avatars/maharaj_1.png'}
                         alt={authorName}
+                        crossOrigin="anonymous"
                         style={{
                           transform: `scale(${avatarZoom / 100}) translate(${avatarOffsetX}%, ${avatarOffsetY}%)`,
                           transformOrigin: 'center center',
                         }}
                         className="w-full h-full object-cover transition-transform"
-                        onError={(e) => {
-                          e.target.onerror = null;
-                          e.target.src = 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" fill="%23d97706"/><circle cx="50" cy="40" r="22" fill="%23fef3c7"/><circle cx="50" cy="36" r="5" fill="%23dc2626"/></svg>';
-                        }}
                       />
                     )}
                   </div>
@@ -380,21 +378,22 @@ const PreviewCard = forwardRef(({ config }, ref) => {
             })()}
 
             {/* Author info */}
-            <div className="flex-1 flex flex-col justify-center min-w-0 pr-2">
-              <div className="flex items-center gap-2 flex-wrap leading-snug">
+            <div className="flex-1 flex flex-col justify-center min-w-0">
+              <div className="flex items-center gap-2">
                 <span
                   style={{
                     color: nameColor,
-                    fontSize: '26px',
+                    fontSize: '24px',
                     fontWeight: 700,
-                    fontFamily: "'Plus Jakarta Sans', sans-serif"
+                    fontFamily: "'Plus Jakarta Sans', sans-serif",
+                    lineHeight: 1.2,
                   }}
-                  className="whitespace-normal break-words"
+                  className="truncate"
                 >
                   {authorName}
                 </span>
                 {isVerified && (
-                  <VerifiedBadge color={badgeColor} size={22} className="shrink-0" />
+                  <VerifiedBadge color={badgeColor} size={20} className="shrink-0" />
                 )}
               </div>
 
@@ -402,11 +401,12 @@ const PreviewCard = forwardRef(({ config }, ref) => {
                 <span
                   style={{
                     color: handleColor,
-                    fontSize: '20px',
+                    fontSize: '18px',
                     fontWeight: 400,
-                    fontFamily: "'Plus Jakarta Sans', sans-serif"
+                    fontFamily: "'Plus Jakarta Sans', sans-serif",
+                    lineHeight: 1.2,
                   }}
-                  className="mt-0.5 tracking-tight whitespace-normal break-words"
+                  className="mt-1 tracking-tight truncate block"
                 >
                   {handle}
                 </span>

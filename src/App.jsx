@@ -32,7 +32,7 @@ const INITIAL_DEFAULT_CONFIG = {
   borderColor: '#ffffff',
 
   // Identity (Default Converted Harikrishna Maharaj Avatar)
-  avatarUrl: 'defaults/avatars/person_avatar.png',
+  avatarUrl: 'defaults/avatars/maharaj_1.png',
   avatarSvg: '',
   avatarRingType: 'gold', // 'gold', 'black', 'white', 'none'
   avatarRingWidth: 4,
@@ -95,8 +95,14 @@ export default function App() {
   const cardRef = useRef(null);
   const canvasContainerRef = useRef(null);
 
-  // Core App State loaded from LocalStorage or Default
-  const [config, setConfig] = useState(() => loadActiveState(INITIAL_DEFAULT_CONFIG));
+  // Core App State loaded from LocalStorage or Default with auto-healing
+  const [config, setConfig] = useState(() => {
+    const loaded = loadActiveState(INITIAL_DEFAULT_CONFIG);
+    if (!loaded.avatarUrl || loaded.avatarUrl.includes('person_avatar')) {
+      loaded.avatarUrl = 'defaults/avatars/maharaj_1.png';
+    }
+    return loaded;
+  });
 
   // UI State
   const [scale, setScale] = useState(0.42);
