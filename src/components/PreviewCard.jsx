@@ -169,14 +169,21 @@ const PreviewCard = forwardRef(({ config }, ref) => {
         />
       ) : (
         <div
-          className="absolute inset-0 w-full h-full bg-cover bg-no-repeat transition-all"
+          className="absolute inset-0 w-full h-full overflow-hidden"
           style={{
-            backgroundImage: `url(${background})`,
-            backgroundPosition: bgPosition,
             filter: `blur(${bgBlur}px) brightness(${bgBrightness}%)`,
             transform: `scale(${bgScale / 100})`,
+            transformOrigin: 'center center',
           }}
-        />
+        >
+          <img
+            src={background}
+            alt="Background"
+            crossOrigin="anonymous"
+            className="w-full h-full object-cover"
+            style={{ objectPosition: bgPosition }}
+          />
+        </div>
       )}
 
       {/* Dark overlay tint layer */}
@@ -373,8 +380,8 @@ const PreviewCard = forwardRef(({ config }, ref) => {
             })()}
 
             {/* Author info */}
-            <div className="flex flex-col justify-center min-w-0">
-              <div className="flex items-center gap-1.5 leading-tight">
+            <div className="flex-1 flex flex-col justify-center min-w-0 pr-2">
+              <div className="flex items-center gap-2 flex-wrap leading-snug">
                 <span
                   style={{
                     color: nameColor,
@@ -382,12 +389,12 @@ const PreviewCard = forwardRef(({ config }, ref) => {
                     fontWeight: 700,
                     fontFamily: "'Plus Jakarta Sans', sans-serif"
                   }}
-                  className="truncate"
+                  className="whitespace-normal break-words"
                 >
                   {authorName}
                 </span>
                 {isVerified && (
-                  <VerifiedBadge color={badgeColor} size={22} className="ml-0.5" />
+                  <VerifiedBadge color={badgeColor} size={22} className="shrink-0" />
                 )}
               </div>
 
@@ -399,7 +406,7 @@ const PreviewCard = forwardRef(({ config }, ref) => {
                     fontWeight: 400,
                     fontFamily: "'Plus Jakarta Sans', sans-serif"
                   }}
-                  className="mt-0.5 tracking-tight truncate"
+                  className="mt-0.5 tracking-tight whitespace-normal break-words"
                 >
                   {handle}
                 </span>

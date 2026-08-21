@@ -306,24 +306,69 @@ export default function App() {
     return () => window.removeEventListener('resize', calculateFitScale);
   }, [config.aspectRatio, autoFit]);
 
+  // Helper to convert any image URL into a Base64 data URL for iOS WebKit compatibility
+  const toDataUrl = async (url) => {
+    if (!url || url.startsWith('data:') || url.startsWith('blob:')) return url;
+    try {
+      const res = await fetch(url, { mode: 'cors' });
+      const blob = await res.blob();
+      return new Promise((resolve) => {
+        const reader = new FileReader();
+        reader.onloadend = () => resolve(reader.result);
+        reader.readAsDataURL(blob);
+      });
+    } catch (e) {
+      console.warn('Could not convert to data URL:', url, e);
+      return url;
+    }
+  };
+
   // High-DPI Export & Save to Photos (with native iOS / Android Share API support)
   const handleExport = async (format = 'png', forceDownload = false) => {
     if (!cardRef.current) return;
     setIsExporting(true);
 
     try {
+      // 1. Ensure all custom Google fonts are fully rasterized
+      if (document.fonts) {
+        await document.fonts.ready;
+      }
+
+      // 2. Pre-inline background and avatar images if they are external / relative URLs
+      if (config.background && !config.isGradientBg && !config.background.startsWith('data:')) {
+        const inlinedBg = await toDataUrl(config.background);
+        if (inlinedBg && inlinedBg !== config.background) {
+          handleConfigChange({ background: inlinedBg });
+          await new Promise((r) => setTimeout(r, 60));
+        }
+      }
+
+      if (config.avatarUrl && !config.avatarSvg && !config.avatarUrl.startsWith('data:')) {
+        const inlinedAvatar = await toDataUrl(config.avatarUrl);
+        if (inlinedAvatar && inlinedAvatar !== config.avatarUrl) {
+          handleConfigChange({ avatarUrl: inlinedAvatar });
+          await new Promise((r) => setTimeout(r, 60));
+        }
+      }
+
       const isJpeg = format === 'jpeg' || format === 'jpg';
       const mimeType = isJpeg ? 'image/jpeg' : 'image/png';
       const ext = isJpeg ? 'jpg' : 'png';
       const cleanAuthor = (config.authorName || 'quote').toLowerCase().replace(/[^a-z0-9]+/g, '-');
       const filename = `${cleanAuthor}-${Date.now()}.${ext}`;
 
-      const blob = await toBlob(cardRef.current, {
+      const options = {
         pixelRatio: 2.0, // High-DPI crisp export
         cacheBust: true,
         quality: isJpeg ? 0.95 : undefined,
-      });
+      };
 
+      // iOS WebKit warm-up pass to force asset rendering in foreignObject
+      try {
+        await toPng(cardRef.current, options);
+      } catch {}
+
+      const blob = await toBlob(cardRef.current, options);
       if (!blob) throw new Error('Failed to generate image blob');
 
       const file = new File([blob], filename, { type: mimeType });
