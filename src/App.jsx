@@ -620,7 +620,7 @@ export default function App() {
                 width: `${canvasDims.width * modalScale}px`,
                 height: `${canvasDims.height * modalScale}px`,
               }}
-              className="relative shrink-0 rounded-2xl overflow-hidden shadow-2xl ring-1 ring-white/20 bg-black transition-all"
+              className="relative shrink-0 rounded-none overflow-hidden shadow-2xl ring-1 ring-white/30 bg-black transition-all"
             >
               <div
                 style={{
