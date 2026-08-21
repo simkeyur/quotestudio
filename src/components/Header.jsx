@@ -13,7 +13,8 @@ import {
   ZoomIn,
   ZoomOut,
   Maximize2,
-  Share2
+  Share2,
+  Eye
 } from 'lucide-react';
 import { ASPECT_RATIOS } from '../constants/fonts';
 
@@ -23,6 +24,7 @@ export default function Header({
   onExport,
   onCopy,
   onRandomize,
+  onOpenFullscreen,
   isExporting,
   copied,
   scale,
@@ -184,6 +186,17 @@ export default function Header({
 
       {/* Actions (Free, Airy Pill Buttons) */}
       <div className="flex items-center gap-2">
+        {/* Fullscreen Preview / Screenshot Modal Button */}
+        <button
+          onClick={onOpenFullscreen}
+          disabled={isExporting}
+          className="h-8 px-2.5 sm:px-3 rounded-full bg-zinc-900/60 hover:bg-zinc-800 text-zinc-200 hover:text-white border border-white/[0.12] text-xs font-semibold transition-all cursor-pointer flex items-center gap-1.5 backdrop-blur-md active:scale-95 shadow-sm"
+          title="Fullscreen Preview & Screenshot"
+        >
+          <Eye size={13} className="text-white" />
+          <span className="hidden sm:inline text-[11px]">Preview</span>
+        </button>
+
         {/* Shuffle / Randomize */}
         <button
           onClick={onRandomize}
@@ -235,9 +248,25 @@ export default function Header({
           {/* Format Dropdown */}
           {downloadDropdown && (
             <div
-              className="absolute right-0 mt-2 w-52 rounded-2xl bg-zinc-950/95 border border-white/10 shadow-2xl p-1.5 z-50 animate-fadeIn backdrop-blur-xl space-y-1"
+              className="absolute right-0 mt-2 w-56 rounded-2xl bg-zinc-950/95 border border-white/10 shadow-2xl p-1.5 z-50 animate-fadeIn backdrop-blur-xl space-y-1"
               onMouseLeave={() => setDownloadDropdown(false)}
             >
+              <button
+                onClick={() => {
+                  setDownloadDropdown(false);
+                  onOpenFullscreen();
+                }}
+                className="w-full text-left px-3 py-2 rounded-xl text-xs text-white hover:bg-white/10 flex items-center justify-between cursor-pointer transition-colors"
+              >
+                <div className="flex items-center gap-2">
+                  <Eye size={14} className="text-white" />
+                  <div className="flex flex-col leading-tight">
+                    <span className="font-semibold">Fullscreen & Screenshot</span>
+                    <span className="text-[10px] text-zinc-400">View pure image without UI</span>
+                  </div>
+                </div>
+              </button>
+
               <button
                 onClick={() => {
                   setDownloadDropdown(false);

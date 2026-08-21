@@ -5,7 +5,7 @@ import Sidebar from './components/Sidebar';
 import PreviewCard from './components/PreviewCard';
 import { PRESET_QUOTES, PRESET_BACKGROUNDS, THEME_PRESETS } from './constants/presets';
 import { loadActiveState, saveActiveState, clearAllLocalData } from './services/storage';
-import { ZoomIn, ZoomOut, Maximize2, CheckCircle2, AlertCircle } from 'lucide-react';
+import { ZoomIn, ZoomOut, Maximize2, CheckCircle2, AlertCircle, X, Share2, Download, Copy, Eye } from 'lucide-react';
 
 const INITIAL_DEFAULT_CONFIG = {
   // Canvas & Aspect
@@ -442,6 +442,48 @@ export default function App() {
     }
   };
 
+  // State for Fullscreen Screenshot / Image Visualizer Modal
+  const [fullscreenImage, setFullscreenImage] = useState(null);
+
+  const handleOpenFullscreen = async () => {
+    if (!cardRef.current) return;
+    setIsExporting(true);
+    try {
+      if (document.fonts) await document.fonts.ready;
+
+      // Pre-inline background and avatar for pristine rendering
+      if (config.background && !config.isGradientBg && !config.background.startsWith('data:')) {
+        const inlinedBg = await toDataUrl(config.background);
+        if (inlinedBg && inlinedBg !== config.background) {
+          handleConfigChange({ background: inlinedBg });
+          await new Promise((r) => setTimeout(r, 60));
+        }
+      }
+
+      if (config.avatarUrl && !config.avatarSvg && !config.avatarUrl.startsWith('data:')) {
+        const inlinedAvatar = await toDataUrl(config.avatarUrl);
+        if (inlinedAvatar && inlinedAvatar !== config.avatarUrl) {
+          handleConfigChange({ avatarUrl: inlinedAvatar });
+          await new Promise((r) => setTimeout(r, 60));
+        }
+      }
+
+      const options = {
+        pixelRatio: 2.0, // crisp high DPI
+        cacheBust: true,
+      };
+
+      try { await toPng(cardRef.current, options); } catch {}
+      const dataUrl = await toPng(cardRef.current, options);
+      setFullscreenImage(dataUrl);
+    } catch (err) {
+      console.error('Fullscreen render error:', err);
+      showToast('Could not open preview. Please try again.', 'error');
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
   const canvasDims = getCanvasDimensions(config.aspectRatio);
 
   return (
@@ -473,6 +515,7 @@ export default function App() {
         onExport={handleExport}
         onCopy={handleCopy}
         onRandomize={handleRandomize}
+        onOpenFullscreen={handleOpenFullscreen}
         isExporting={isExporting}
         copied={copied}
         scale={scale}
@@ -557,6 +600,78 @@ export default function App() {
           />
         </div>
       </div>
+
+      {/* Fullscreen Screenshot / Pure Image Visualizer Modal */}
+      {fullscreenImage && (
+        <div
+          className="fixed inset-0 z-50 bg-black/95 backdrop-blur-2xl flex flex-col items-center justify-between p-3 sm:p-6 animate-fadeIn select-none"
+          onClick={() => setFullscreenImage(null)}
+        >
+          {/* Top Bar: Title & Close Button */}
+          <div className="w-full max-w-4xl flex items-center justify-between z-10 shrink-0">
+            <div className="flex items-center gap-2">
+              <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
+              <span className="text-xs font-semibold text-white tracking-wide">
+                Pure Image Preview & Screenshot
+              </span>
+            </div>
+            <button
+              onClick={() => setFullscreenImage(null)}
+              className="p-2 rounded-full bg-zinc-900/90 hover:bg-zinc-800 text-zinc-300 hover:text-white border border-white/15 transition-all cursor-pointer shadow-lg active:scale-95"
+              title="Close Preview (Esc)"
+            >
+              <X size={18} />
+            </button>
+          </div>
+
+          {/* Centered Pure High-Res Image for clean Screenshot / Long-press Save */}
+          <div
+            className="flex-1 w-full max-w-4xl flex items-center justify-center py-2 overflow-hidden"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <img
+              src={fullscreenImage}
+              alt="Quote Card"
+              className="max-h-[76vh] max-w-[92vw] sm:max-w-full object-contain rounded-2xl shadow-2xl ring-1 ring-white/10"
+            />
+          </div>
+
+          {/* Bottom Action Dock & iOS Screenshot Hint */}
+          <div
+            className="w-full max-w-lg flex flex-col items-center gap-2.5 z-10 shrink-0 pb-2"
+            onClick={(e) => e.stopPropagation()}
+          >
+            <p className="text-[11px] text-zinc-400 text-center font-medium">
+              💡 <span className="text-zinc-200">iPhone / Mobile:</span> Long-press image & tap <span className="text-white font-bold">"Save to Photos"</span>, or take a screenshot!
+            </p>
+
+            <div className="flex items-center gap-2 bg-zinc-900/90 p-1.5 rounded-full border border-white/10 backdrop-blur-xl shadow-2xl">
+              <button
+                onClick={() => handleExport('png')}
+                className="flex items-center gap-1.5 px-4 py-1.5 bg-white text-black hover:bg-zinc-100 rounded-full text-xs font-bold transition-all cursor-pointer shadow active:scale-95"
+              >
+                <Share2 size={13} />
+                <span>Save / Share</span>
+              </button>
+
+              <button
+                onClick={() => handleExport('png', true)}
+                className="flex items-center gap-1.5 px-3.5 py-1.5 bg-zinc-800 hover:bg-zinc-700 text-white rounded-full text-xs font-medium transition-all cursor-pointer active:scale-95"
+              >
+                <Download size={13} />
+                <span>Download</span>
+              </button>
+
+              <button
+                onClick={() => setFullscreenImage(null)}
+                className="px-3 py-1.5 rounded-full text-xs text-zinc-400 hover:text-white hover:bg-white/10 transition-all cursor-pointer"
+              >
+                Done
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
