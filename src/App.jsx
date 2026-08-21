@@ -306,29 +306,57 @@ export default function App() {
     return () => window.removeEventListener('resize', calculateFitScale);
   }, [config.aspectRatio, autoFit]);
 
-  // Export to PNG / JPEG
-  const handleExport = async (format = 'png') => {
+  // High-DPI Export & Save to Photos (with native iOS / Android Share API support)
+  const handleExport = async (format = 'png', forceDownload = false) => {
     if (!cardRef.current) return;
     setIsExporting(true);
 
     try {
-      let dataUrl;
-      const options = {
-        pixelRatio: 1.5,
-        cacheBust: true,
-      };
+      const isJpeg = format === 'jpeg' || format === 'jpg';
+      const mimeType = isJpeg ? 'image/jpeg' : 'image/png';
+      const ext = isJpeg ? 'jpg' : 'png';
+      const cleanAuthor = (config.authorName || 'quote').toLowerCase().replace(/[^a-z0-9]+/g, '-');
+      const filename = `${cleanAuthor}-${Date.now()}.${ext}`;
 
-      if (format === 'jpeg' || format === 'jpg') {
-        dataUrl = await toJpeg(cardRef.current, { ...options, quality: 0.95 });
-      } else {
-        dataUrl = await toPng(cardRef.current, options);
+      const blob = await toBlob(cardRef.current, {
+        pixelRatio: 2.0, // High-DPI crisp export
+        cacheBust: true,
+        quality: isJpeg ? 0.95 : undefined,
+      });
+
+      if (!blob) throw new Error('Failed to generate image blob');
+
+      const file = new File([blob], filename, { type: mimeType });
+
+      // If mobile device (iOS/Android) supports Web Share API with files
+      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent) || (navigator.maxTouchPoints > 1);
+
+      if (!forceDownload && isMobile && navigator.canShare && navigator.canShare({ files: [file] })) {
+        try {
+          await navigator.share({
+            files: [file],
+            title: config.authorName || 'Quote Card',
+          });
+          showToast('Tap "Save Image" to save directly to Photos! 📸');
+          return;
+        } catch (shareErr) {
+          if (shareErr.name === 'AbortError') {
+            // User cancelled/closed share sheet
+            return;
+          }
+          console.warn('Share API failed, falling back to download:', shareErr);
+        }
       }
 
+      // Standard browser download fallback
+      const dataUrl = URL.createObjectURL(blob);
       const link = document.createElement('a');
-      const filename = `quote-${config.authorName.toLowerCase().replace(/\s+/g, '-')}-${Date.now()}.${format}`;
       link.download = filename;
       link.href = dataUrl;
+      document.body.appendChild(link);
       link.click();
+      document.body.removeChild(link);
+      setTimeout(() => URL.revokeObjectURL(dataUrl), 1500);
 
       showToast(`Exported image successfully! 🎉`);
     } catch (err) {

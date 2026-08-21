@@ -12,7 +12,8 @@ import {
   Sparkles,
   ZoomIn,
   ZoomOut,
-  Maximize2
+  Maximize2,
+  Share2
 } from 'lucide-react';
 import { ASPECT_RATIOS } from '../constants/fonts';
 
@@ -234,7 +235,7 @@ export default function Header({
           {/* Format Dropdown */}
           {downloadDropdown && (
             <div
-              className="absolute right-0 mt-2 w-44 rounded-xl bg-zinc-900/95 border border-white/10 shadow-2xl py-1 z-50 animate-fadeIn backdrop-blur-xl"
+              className="absolute right-0 mt-2 w-52 rounded-2xl bg-zinc-950/95 border border-white/10 shadow-2xl p-1.5 z-50 animate-fadeIn backdrop-blur-xl space-y-1"
               onMouseLeave={() => setDownloadDropdown(false)}
             >
               <button
@@ -242,7 +243,25 @@ export default function Header({
                   setDownloadDropdown(false);
                   onExport('png');
                 }}
-                className="w-full text-left px-3.5 py-2 text-xs text-zinc-200 hover:text-white hover:bg-white/10 flex items-center justify-between cursor-pointer transition-colors"
+                className="w-full text-left px-3 py-2 rounded-xl text-xs text-white hover:bg-white/10 flex items-center justify-between cursor-pointer transition-colors"
+              >
+                <div className="flex items-center gap-2">
+                  <Share2 size={14} className="text-white" />
+                  <div className="flex flex-col leading-tight">
+                    <span className="font-semibold">Save to Photos / Share</span>
+                    <span className="text-[10px] text-zinc-400">iOS & Mobile Share Sheet</span>
+                  </div>
+                </div>
+              </button>
+
+              <div className="h-px bg-white/10 my-1" />
+
+              <button
+                onClick={() => {
+                  setDownloadDropdown(false);
+                  onExport('png', true);
+                }}
+                className="w-full text-left px-3 py-1.5 rounded-xl text-xs text-zinc-300 hover:text-white hover:bg-white/10 flex items-center justify-between cursor-pointer transition-colors"
               >
                 <span>Download PNG (Lossless)</span>
                 <span className="text-[10px] text-zinc-500 font-mono">High-Res</span>
@@ -250,9 +269,9 @@ export default function Header({
               <button
                 onClick={() => {
                   setDownloadDropdown(false);
-                  onExport('jpeg');
+                  onExport('jpeg', true);
                 }}
-                className="w-full text-left px-3.5 py-2 text-xs text-zinc-200 hover:text-white hover:bg-white/10 flex items-center justify-between cursor-pointer transition-colors"
+                className="w-full text-left px-3 py-1.5 rounded-xl text-xs text-zinc-300 hover:text-white hover:bg-white/10 flex items-center justify-between cursor-pointer transition-colors"
               >
                 <span>Download JPEG (Compact)</span>
                 <span className="text-[10px] text-zinc-500 font-mono">Photo</span>
