@@ -66,13 +66,13 @@ function formatTitle(filename) {
 const dynamicAvatars = Object.keys(dynamicAvatarFiles)
   .sort()
   .map((path) => {
-    const relativeUrl = path.replace(/^\/public\//, '');
+    const resolvedUrl = dynamicAvatarFiles[path] || path.replace(/^\/public\//, '');
     const filename = path.split('/').pop();
     const id = `avatar-${filename.replace(/\.[^/.]+$/, '')}`;
     return {
       id,
       name: formatTitle(filename),
-      url: relativeUrl,
+      url: resolvedUrl,
       svg: '',
     };
   });
@@ -125,13 +125,13 @@ function getCategoryFromPath(path) {
 const dynamicBackgrounds = Object.keys(dynamicBgFiles)
   .sort()
   .map((path) => {
-    const relativeUrl = path.replace(/^\/public\//, '');
+    const resolvedUrl = dynamicBgFiles[path] || path.replace(/^\/public\//, '');
     const filename = path.split('/').pop();
     const id = `bg-${filename.replace(/\.[^/.]+$/, '')}`;
     return {
       id,
       name: formatTitle(filename),
-      url: relativeUrl,
+      url: resolvedUrl,
       category: getCategoryFromPath(path)
     };
   });
