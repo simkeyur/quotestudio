@@ -768,53 +768,96 @@ export default function Sidebar({
               />
             </div>
 
-            {/* Vertical Drag Position */}
-            <div className="pt-2 border-t border-zinc-800/80 space-y-2">
-              <div className="flex items-center justify-between text-xs font-semibold text-zinc-400">
-                <span>Vertical Position</span>
-                <span className="text-white font-mono">{config.cardPositionY ?? 50}%</span>
-              </div>
-              <input
-                type="range"
-                min="10"
-                max="90"
-                step="1"
-                value={config.cardPositionY ?? 50}
-                onChange={(e) => onChange({ cardPositionY: parseInt(e.target.value) })}
-                className="w-full accent-white cursor-pointer"
-              />
-              <div className="flex justify-between text-[10px] text-zinc-500">
-                <span>Top (10%)</span>
-                <span>Center (50%)</span>
-                <span>Bottom (90%)</span>
+            {/* 2D Drag & Position Controls */}
+            <div className="pt-2 border-t border-zinc-800/80 space-y-3">
+              <span className="text-xs font-semibold text-zinc-400 uppercase tracking-wider block">
+                Card Position (2D Free Drag)
+              </span>
+
+              {/* Horizontal Position Slider */}
+              <div>
+                <div className="flex items-center justify-between text-xs font-semibold text-zinc-400 mb-0.5">
+                  <span>Horizontal (X)</span>
+                  <span className="text-white font-mono">{config.cardPositionX ?? 50}%</span>
+                </div>
+                <input
+                  type="range"
+                  min="10"
+                  max="90"
+                  step="1"
+                  value={config.cardPositionX ?? 50}
+                  onChange={(e) => onChange({ cardPositionX: parseInt(e.target.value) })}
+                  className="w-full accent-white cursor-pointer"
+                />
+                <div className="flex justify-between text-[10px] text-zinc-500">
+                  <span>Left (10%)</span>
+                  <span>Center (50%)</span>
+                  <span>Right (90%)</span>
+                </div>
               </div>
 
-              {/* Quick Snap buttons */}
-              <div className="grid grid-cols-3 gap-1.5 pt-1">
-                {[
-                  { pos: 16, label: 'Top' },
-                  { pos: 50, label: 'Center' },
-                  { pos: 84, label: 'Bottom' },
-                ].map((s) => (
-                  <button
-                    key={s.label}
-                    type="button"
-                    onClick={() => onChange({ cardPositionY: s.pos })}
-                    className={`py-1.5 text-xs font-medium rounded-lg border transition-all cursor-pointer ${
-                      Math.abs((config.cardPositionY ?? 50) - s.pos) < 6
-                        ? 'bg-white text-black border-white shadow font-bold'
-                        : 'bg-zinc-900 border-zinc-800 text-zinc-400 hover:text-white'
-                    }`}
-                  >
-                    {s.label}
-                  </button>
-                ))}
+              {/* Vertical Position Slider */}
+              <div>
+                <div className="flex items-center justify-between text-xs font-semibold text-zinc-400 mb-0.5">
+                  <span>Vertical (Y)</span>
+                  <span className="text-white font-mono">{config.cardPositionY ?? 50}%</span>
+                </div>
+                <input
+                  type="range"
+                  min="10"
+                  max="90"
+                  step="1"
+                  value={config.cardPositionY ?? 50}
+                  onChange={(e) => onChange({ cardPositionY: parseInt(e.target.value) })}
+                  className="w-full accent-white cursor-pointer"
+                />
+                <div className="flex justify-between text-[10px] text-zinc-500">
+                  <span>Top (10%)</span>
+                  <span>Center (50%)</span>
+                  <span>Bottom (90%)</span>
+                </div>
+              </div>
+
+              {/* 9-Point Quick Alignment Grid */}
+              <div>
+                <span className="text-[11px] text-zinc-400 block mb-1.5">Quick 2D Alignment</span>
+                <div className="grid grid-cols-3 gap-1">
+                  {[
+                    { x: 30, y: 20, label: '↖ Top-L' },
+                    { x: 50, y: 20, label: '↑ Top' },
+                    { x: 70, y: 20, label: '↗ Top-R' },
+                    { x: 30, y: 50, label: '← Left' },
+                    { x: 50, y: 50, label: '• Center' },
+                    { x: 70, y: 50, label: '→ Right' },
+                    { x: 30, y: 80, label: '↙ Btm-L' },
+                    { x: 50, y: 80, label: '↓ Bottom' },
+                    { x: 70, y: 80, label: '↘ Btm-R' },
+                  ].map((a) => {
+                    const isActive =
+                      Math.abs((config.cardPositionX ?? 50) - a.x) < 8 &&
+                      Math.abs((config.cardPositionY ?? 50) - a.y) < 8;
+                    return (
+                      <button
+                        key={a.label}
+                        type="button"
+                        onClick={() => onChange({ cardPositionX: a.x, cardPositionY: a.y })}
+                        className={`py-1.5 text-[11px] font-medium rounded-lg border transition-all cursor-pointer ${
+                          isActive
+                            ? 'bg-white text-black border-white shadow font-bold'
+                            : 'bg-zinc-900 border-zinc-800 text-zinc-400 hover:text-white'
+                        }`}
+                      >
+                        {a.label}
+                      </button>
+                    );
+                  })}
+                </div>
               </div>
 
               {/* Drag Hint Banner */}
               <div className="p-2.5 rounded-lg bg-zinc-900/80 border border-zinc-800 flex items-center gap-2 text-[11px] text-zinc-400">
                 <span className="text-sm">✋</span>
-                <span>Click & drag the white card on the preview to position it anywhere!</span>
+                <span>Click & drag the quote card freely in 2D anywhere on the canvas!</span>
               </div>
             </div>
           </div>

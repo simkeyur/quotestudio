@@ -12,7 +12,8 @@ const PreviewCard = forwardRef(({ config }, ref) => {
     bgScale = 100,
     bgPosition = 'center',
     
-    // Card styling & vertical drag position
+    // Card styling & 2D drag position
+    cardPositionX = 50, // % from left (0 = left, 50 = center, 100 = right)
     cardPositionY = 50, // % from top (0 = top, 50 = center, 100 = bottom)
     cardWidth = 88, // %
     cardRadius = 28, // px
@@ -207,10 +208,10 @@ const PreviewCard = forwardRef(({ config }, ref) => {
           }`}
           style={{
             position: 'absolute',
-            left: `${(100 - cardWidth) / 2}%`,
+            left: `${cardPositionX ?? 50}%`,
+            top: `${cardPositionY ?? 50}%`,
             width: `${cardWidth}%`,
-            top: `${cardPositionY}%`,
-            transform: `translateY(-${cardPositionY}%)`,
+            transform: `translate(-${cardPositionX ?? 50}%, -${cardPositionY ?? 50}%)`,
             borderRadius: `${cardRadius * 1.5}px`,
             backgroundColor: hexToRgba(cardBg, cardOpacity),
             backdropFilter: cardBlur > 0 ? `blur(${cardBlur}px)` : 'none',

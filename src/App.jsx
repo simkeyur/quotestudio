@@ -21,6 +21,7 @@ const INITIAL_DEFAULT_CONFIG = {
   bgPosition: 'center',
 
   // Card Style
+  cardPositionX: 50, // % from left (0 = left, 50 = center, 100 = right)
   cardPositionY: 50, // % from top (0 = top, 50 = center, 100 = bottom)
   cardWidth: 86,
   cardRadius: 28,
@@ -111,11 +112,13 @@ export default function App() {
   const [copied, setCopied] = useState(false);
   const [toastMessage, setToastMessage] = useState(null);
 
-  // Interactive Drag & Drop positioning for the quote card tile
+  // Interactive 2D Drag & Drop positioning for the quote card tile
   const [isDragging, setIsDragging] = useState(false);
   const isDraggingRef = useRef(false);
+  const dragStartXRef = useRef(0);
   const dragStartYRef = useRef(0);
-  const dragStartPosRef = useRef(50);
+  const dragStartPosXRef = useRef(50);
+  const dragStartPosYRef = useRef(50);
 
   const handleCardPointerDown = (e) => {
     // If resizing is active, do not trigger drag
@@ -125,19 +128,32 @@ export default function App() {
       e.currentTarget.setPointerCapture(e.pointerId);
     } catch {}
     isDraggingRef.current = true;
+    dragStartXRef.current = e.clientX;
     dragStartYRef.current = e.clientY;
-    dragStartPosRef.current = config.cardPositionY ?? 50;
+    dragStartPosXRef.current = config.cardPositionX ?? 50;
+    dragStartPosYRef.current = config.cardPositionY ?? 50;
     setIsDragging(true);
   };
 
   const handleCardPointerMove = (e) => {
     if (!isDraggingRef.current) return;
+    const deltaX = (e.clientX - dragStartXRef.current) / scale;
     const deltaY = (e.clientY - dragStartYRef.current) / scale;
-    const { height: canvasHeight } = getCanvasDimensions(config.aspectRatio);
-    const deltaPercent = (deltaY / canvasHeight) * 100;
-    let newPos = dragStartPosRef.current + deltaPercent;
-    newPos = Math.max(8, Math.min(92, newPos));
-    handleConfigChange({ cardPositionY: Math.round(newPos) });
+    const { width: canvasWidth, height: canvasHeight } = getCanvasDimensions(config.aspectRatio);
+
+    const deltaPercentX = (deltaX / canvasWidth) * 100;
+    const deltaPercentY = (deltaY / canvasHeight) * 100;
+
+    let newPosX = dragStartPosXRef.current + deltaPercentX;
+    let newPosY = dragStartPosYRef.current + deltaPercentY;
+
+    newPosX = Math.max(5, Math.min(95, newPosX));
+    newPosY = Math.max(5, Math.min(95, newPosY));
+
+    handleConfigChange({
+      cardPositionX: Math.round(newPosX),
+      cardPositionY: Math.round(newPosY),
+    });
   };
 
   const handleCardPointerUp = (e) => {
