@@ -362,7 +362,7 @@ const PreviewCard = forwardRef(({ config }, ref) => {
                       />
                     ) : (
                       <img
-                        src={avatarUrl || 'defaults/avatars/maharaj_1.png'}
+                        src={avatarUrl || 'defaults/avatars/harikrishna-1.jpg'}
                         alt={authorName}
                         crossOrigin="anonymous"
                         style={{
