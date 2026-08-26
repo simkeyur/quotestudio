@@ -317,10 +317,10 @@ const PreviewCard = forwardRef(({ config }, ref) => {
               let pad = `${avatarRingWidth}px`;
 
               if (avatarRingType === 'gold') {
-                ringBg = 'linear-gradient(135deg, #fef08a 0%, #eab308 25%, #ca8a04 50%, #fef08a 75%, #a16207 100%)';
+                ringBg = 'linear-gradient(135deg, #d97706 0%, #b45309 30%, #78350f 60%, #b45309 80%, #451a03 100%)';
                 ringShadow = avatarRingGlow
-                  ? '0 0 18px rgba(234, 179, 8, 0.6), 0 2px 8px rgba(0,0,0,0.3)'
-                  : '0 2px 8px rgba(0,0,0,0.25)';
+                  ? '0 0 16px rgba(180, 83, 9, 0.55), 0 2px 8px rgba(0,0,0,0.4)'
+                  : '0 2px 8px rgba(0,0,0,0.35)';
               } else if (avatarRingType === 'black') {
                 ringBg = '#000000';
                 ringShadow = '0 3px 12px rgba(0,0,0,0.45)';
@@ -456,10 +456,10 @@ const PreviewCard = forwardRef(({ config }, ref) => {
         <div
           className={`absolute z-20 pointer-events-none transition-all ${
             watermarkPosition === 'bottom-left'
-              ? 'bottom-8 left-10'
+              ? 'bottom-4 left-6'
               : watermarkPosition === 'bottom-center'
-              ? 'bottom-8 left-1/2 -translate-x-1/2'
-              : 'bottom-8 right-10'
+              ? 'bottom-4 left-1/2 -translate-x-1/2'
+              : 'bottom-4 right-6'
           }`}
         >
           <div
