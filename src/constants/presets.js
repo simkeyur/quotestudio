@@ -64,7 +64,7 @@ function formatTitle(filename) {
 
 // Map discovered avatar files dynamically
 const dynamicAvatars = Object.keys(dynamicAvatarFiles)
-  .sort()
+  .sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' }))
   .map((path) => {
     const resolvedUrl = dynamicAvatarFiles[path] || path.replace(/^\/public\//, '');
     const filename = path.split('/').pop();
@@ -123,7 +123,7 @@ function getCategoryFromPath(path) {
 }
 
 const dynamicBackgrounds = Object.keys(dynamicBgFiles)
-  .sort()
+  .sort((a, b) => a.localeCompare(b, undefined, { numeric: true, sensitivity: 'base' }))
   .map((path) => {
     const resolvedUrl = dynamicBgFiles[path] || path.replace(/^\/public\//, '');
     const filename = path.split('/').pop();
