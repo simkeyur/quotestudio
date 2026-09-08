@@ -42,11 +42,25 @@ export function getSavedDrafts() {
 }
 
 /**
- * Save a new named draft
+ * Save a new named draft or update an existing draft
  */
-export function saveDraft(name, config) {
+export function saveDraft(name, config, id = null) {
   try {
     const drafts = getSavedDrafts();
+    const existingIndex = id ? drafts.findIndex((d) => d.id === id) : -1;
+
+    if (existingIndex !== -1) {
+      const updatedDraft = {
+        ...drafts[existingIndex],
+        name: name || drafts[existingIndex].name,
+        updatedAt: new Date().toISOString(),
+        config: { ...config }
+      };
+      drafts[existingIndex] = updatedDraft;
+      localStorage.setItem(STORAGE_KEY_DRAFTS, JSON.stringify(drafts));
+      return updatedDraft;
+    }
+
     const newDraft = {
       id: 'draft_' + Date.now(),
       name: name || `Quote Draft ${drafts.length + 1}`,

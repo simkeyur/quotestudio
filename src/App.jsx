@@ -3,8 +3,8 @@ import { toPng, toJpeg, toBlob } from 'html-to-image';
 import Header from './components/Header';
 import Sidebar from './components/Sidebar';
 import PreviewCard from './components/PreviewCard';
-import { PRESET_QUOTES, PRESET_BACKGROUNDS, THEME_PRESETS } from './constants/presets';
-import { loadActiveState, saveActiveState, clearAllLocalData } from './services/storage';
+import { PRESET_QUOTES } from './constants/presets';
+import { loadActiveState, saveActiveState, saveDraft, getSavedDrafts, clearAllLocalData } from './services/storage';
 import { ZoomIn, ZoomOut, Maximize2, CheckCircle2, AlertCircle, X, Share2, Download, Copy, Eye } from 'lucide-react';
 
 const INITIAL_DEFAULT_CONFIG = {
@@ -42,7 +42,7 @@ const INITIAL_DEFAULT_CONFIG = {
   avatarOffsetX: 0,
   avatarOffsetY: 0,
   authorName: 'Harikrishna Maharaj',
-  handle: '@vachanamrutquotes',
+  handle: '@vachanamrut.quotes',
   isVerified: true,
   badgeColor: '#1d9bf0',
 
@@ -53,7 +53,7 @@ const INITIAL_DEFAULT_CONFIG = {
 
   // Watermark / Website Branding
   showWatermark: true,
-  watermarkText: 'vachanamrut.in',
+  watermarkText: 'vachanamrut.quotes',
   watermarkPosition: 'bottom-right',
   watermarkStyle: 'pill',
   watermarkColor: '#ffffff',
@@ -102,6 +102,12 @@ export default function App() {
     if (!loaded.avatarUrl || loaded.avatarUrl.includes('person_avatar') || loaded.avatarUrl.includes('maharaj_1')) {
       loaded.avatarUrl = 'defaults/avatars/harikrishna-1.jpg';
     }
+    if (!loaded.watermarkText || loaded.watermarkText === 'vachanamrut.in') {
+      loaded.watermarkText = 'vachanamrut.quotes';
+    }
+    if (!loaded.handle || loaded.handle === '@vachanamrutquotes') {
+      loaded.handle = '@vachanamrut.quotes';
+    }
     return loaded;
   });
 
@@ -110,6 +116,9 @@ export default function App() {
   const [autoFit, setAutoFit] = useState(true);
   const [isExporting, setIsExporting] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [saved, setSaved] = useState(false);
+  const [savedDraftsList, setSavedDraftsList] = useState(getSavedDrafts);
+  const [currentDraftId, setCurrentDraftId] = useState(null);
   const [toastMessage, setToastMessage] = useState(null);
 
   // Interactive 2D Drag & Drop positioning for the quote card tile
@@ -259,8 +268,9 @@ export default function App() {
 
   // Reset to default template
   const handleResetDefaults = () => {
-    clearAllLocalData();
+    localStorage.removeItem('quote_studio_active_state_v1');
     setConfig({ ...INITIAL_DEFAULT_CONFIG });
+    setCurrentDraftId(null);
     showToast('Reset to default template!');
   };
 
@@ -283,25 +293,23 @@ export default function App() {
     showToast(`Applied ${theme.name} theme`);
   };
 
-  // Shuffle / Randomize (Preserves author name, handle, avatar image, and user settings)
-  const handleRandomize = () => {
-    const randomQuote = PRESET_QUOTES[Math.floor(Math.random() * PRESET_QUOTES.length)];
-    const randomBg = PRESET_BACKGROUNDS[Math.floor(Math.random() * PRESET_BACKGROUNDS.length)];
-    const randomTheme = THEME_PRESETS[Math.floor(Math.random() * THEME_PRESETS.length)];
+  // Save current quote card to local drafts & localStorage
+  const handleSave = () => {
+    saveActiveState(config);
+    const quoteSnippet = config.quoteText?.trim()
+      ? (config.quoteText.trim().length > 32
+          ? `"${config.quoteText.trim().slice(0, 32)}..."`
+          : `"${config.quoteText.trim()}"`)
+      : `${config.authorName || 'Quote'} (${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })})`;
 
-    handleConfigChange({
-      quoteText: randomQuote.text,
-      citation: randomQuote.citation,
-      background: randomBg.url,
-      isGradientBg: !!randomBg.isGradient,
-      cardBg: randomTheme.cardBg,
-      cardOpacity: randomTheme.cardOpacity,
-      textColor: randomTheme.textColor,
-      nameColor: randomTheme.nameColor,
-      handleColor: randomTheme.handleColor,
-      citationColor: randomTheme.citationColor,
-    });
-    showToast('Shuffled quote & background! ✨');
+    const savedDraft = saveDraft(quoteSnippet, config, currentDraftId);
+    if (savedDraft) {
+      setCurrentDraftId(savedDraft.id);
+      setSavedDraftsList(getSavedDrafts());
+    }
+    setSaved(true);
+    setTimeout(() => setSaved(false), 2000);
+    showToast(currentDraftId ? 'Draft updated! 💾' : 'Saved quote to drafts! 💾');
   };
 
   // Auto-scale preview canvas for Mobile & Desktop
@@ -473,11 +481,18 @@ export default function App() {
   useEffect(() => {
     if (!isFullscreenView) return;
     const updateModalScale = () => {
-      const availW = window.innerWidth * 0.94;
-      const availH = window.innerHeight * 0.76;
-      const scaleW = availW / canvasDims.width;
-      const scaleH = availH / canvasDims.height;
-      setModalScale(Math.min(scaleW, scaleH));
+      const isMobile = window.innerWidth < 768;
+      if (isMobile) {
+        // Take sides end to end on phone: exactly 100% of screen width with no side gaps
+        const scaleW = window.innerWidth / canvasDims.width;
+        setModalScale(scaleW);
+      } else {
+        const availW = window.innerWidth * 0.96;
+        const availH = window.innerHeight * 0.82;
+        const scaleW = availW / canvasDims.width;
+        const scaleH = availH / canvasDims.height;
+        setModalScale(Math.min(scaleW, scaleH));
+      }
     };
     updateModalScale();
     window.addEventListener('resize', updateModalScale);
@@ -516,7 +531,8 @@ export default function App() {
         onAspectRatioChange={(ratio) => handleConfigChange({ aspectRatio: ratio })}
         onExport={handleExport}
         onCopy={handleCopy}
-        onRandomize={handleRandomize}
+        onSave={handleSave}
+        saved={saved}
         onOpenFullscreen={handleOpenFullscreen}
         isExporting={isExporting}
         copied={copied}
@@ -536,6 +552,9 @@ export default function App() {
             onApplyTheme={handleApplyTheme}
             onResetDefaults={handleResetDefaults}
             onShowToast={showToast}
+            savedDraftsList={savedDraftsList}
+            onDraftsChange={() => setSavedDraftsList(getSavedDrafts())}
+            setCurrentDraftId={setCurrentDraftId}
           />
         </div>
 
@@ -599,6 +618,9 @@ export default function App() {
             onApplyTheme={handleApplyTheme}
             onResetDefaults={handleResetDefaults}
             onShowToast={showToast}
+            savedDraftsList={savedDraftsList}
+            onDraftsChange={() => setSavedDraftsList(getSavedDrafts())}
+            setCurrentDraftId={setCurrentDraftId}
           />
         </div>
       </div>
@@ -606,11 +628,11 @@ export default function App() {
       {/* Fullscreen Screenshot / Pure CSS Live Preview Modal */}
       {isFullscreenView && (
         <div
-          className="fixed inset-0 z-50 bg-black/95 backdrop-blur-2xl flex flex-col items-center justify-between p-3 sm:p-5 animate-fadeIn select-none"
+          className="fixed inset-0 z-50 bg-black/95 backdrop-blur-2xl flex flex-col items-center justify-between px-0 py-2 sm:p-5 animate-fadeIn select-none overflow-hidden"
           onClick={() => setIsFullscreenView(false)}
         >
           {/* Top Bar: Title & Close Button */}
-          <div className="w-full max-w-4xl flex items-center justify-between z-10 shrink-0">
+          <div className="w-full max-w-4xl px-4 sm:px-0 flex items-center justify-between z-10 shrink-0">
             <div className="flex items-center gap-2">
               <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse" />
               <span className="text-xs font-semibold text-white tracking-wide">
@@ -626,9 +648,9 @@ export default function App() {
             </button>
           </div>
 
-          {/* Centered Pure Live CSS PreviewCard for 100% Crisp Screenshots */}
+          {/* Centered Pure Live CSS PreviewCard for 100% Crisp Screenshots - Flush End-to-End on Phone */}
           <div
-            className="flex-1 w-full max-w-5xl flex items-center justify-center p-2 overflow-hidden"
+            className="flex-1 w-full flex items-center justify-center p-0 overflow-y-auto overflow-x-hidden"
             onClick={(e) => e.stopPropagation()}
           >
             <div
@@ -636,7 +658,7 @@ export default function App() {
                 width: `${canvasDims.width * modalScale}px`,
                 height: `${canvasDims.height * modalScale}px`,
               }}
-              className="relative shrink-0 rounded-none overflow-hidden shadow-2xl ring-1 ring-white/30 bg-black transition-all"
+              className="relative shrink-0 rounded-none overflow-hidden shadow-2xl sm:ring-1 sm:ring-white/30 bg-black transition-all"
             >
               <div
                 style={{
@@ -660,7 +682,7 @@ export default function App() {
 
           {/* Bottom Action Dock & iOS Screenshot Hint */}
           <div
-            className="w-full max-w-lg flex flex-col items-center gap-2 z-10 shrink-0 pb-1"
+            className="w-full max-w-lg px-4 sm:px-0 flex flex-col items-center gap-2 z-10 shrink-0 pb-1"
             onClick={(e) => e.stopPropagation()}
           >
             <p className="text-[11px] text-zinc-400 text-center font-medium">

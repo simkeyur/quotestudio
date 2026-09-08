@@ -14,7 +14,8 @@ import {
   ZoomOut,
   Maximize2,
   Share2,
-  Eye
+  Eye,
+  Save
 } from 'lucide-react';
 import { ASPECT_RATIOS } from '../constants/fonts';
 
@@ -23,7 +24,8 @@ export default function Header({
   onAspectRatioChange,
   onExport,
   onCopy,
-  onRandomize,
+  onSave,
+  saved,
   onOpenFullscreen,
   isExporting,
   copied,
@@ -56,7 +58,7 @@ export default function Header({
   return (
     <header className="h-16 border-b border-white/[0.06] bg-black/60 backdrop-blur-xl px-3 sm:px-6 flex items-center justify-between z-30 shrink-0 select-none transition-all">
       {/* Brand & Logo */}
-      <div className="flex items-center gap-2 sm:gap-2.5">
+      <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
         <img
           src="./logo.png"
           alt="Quote Studio"
@@ -185,33 +187,38 @@ export default function Header({
       </div>
 
       {/* Actions (Free, Airy Pill Buttons) */}
-      <div className="flex items-center gap-2">
+      <div className="flex items-center gap-1.5 sm:gap-2">
         {/* Fullscreen Preview / Screenshot Modal Button */}
         <button
           onClick={onOpenFullscreen}
           disabled={isExporting}
-          className="h-8 px-2.5 sm:px-3 rounded-full bg-zinc-900/60 hover:bg-zinc-800 text-zinc-200 hover:text-white border border-white/[0.12] text-xs font-semibold transition-all cursor-pointer flex items-center gap-1.5 backdrop-blur-md active:scale-95 shadow-sm"
+          className="flex h-8 px-2.5 sm:px-3 rounded-full bg-zinc-900/60 hover:bg-zinc-800 text-zinc-200 hover:text-white border border-white/[0.12] text-xs font-semibold transition-all cursor-pointer items-center gap-1.5 backdrop-blur-md active:scale-95 shadow-sm"
           title="Fullscreen Preview & Screenshot"
         >
           <Eye size={13} className="text-white" />
           <span className="hidden sm:inline text-[11px]">Preview</span>
         </button>
 
-        {/* Shuffle / Randomize */}
+        {/* Save Draft */}
         <button
-          onClick={onRandomize}
-          className="h-8 px-2.5 sm:px-3 rounded-full bg-zinc-900/60 hover:bg-zinc-800 text-zinc-300 hover:text-white border border-white/[0.08] text-xs font-medium transition-all cursor-pointer flex items-center gap-1.5 backdrop-blur-md active:scale-95"
-          title="Shuffle Quote & Background"
+          onClick={onSave}
+          disabled={isExporting}
+          className={`h-8 px-2.5 sm:px-3 rounded-full text-xs font-medium border transition-all cursor-pointer flex items-center gap-1.5 backdrop-blur-md active:scale-95 ${
+            saved
+              ? 'bg-zinc-800 border-zinc-600 text-emerald-400'
+              : 'bg-zinc-900/60 hover:bg-zinc-800 border-white/[0.08] text-zinc-300 hover:text-white'
+          }`}
+          title="Save Quote Draft"
         >
-          <RefreshCw size={13} />
-          <span className="hidden sm:inline text-[11px]">Shuffle</span>
+          {saved ? <Check size={13} className="text-emerald-400" /> : <Save size={13} />}
+          <span className="hidden sm:inline text-[11px]">{saved ? 'Saved!' : 'Save'}</span>
         </button>
 
-        {/* Copy to Clipboard */}
+        {/* Copy to Clipboard (Desktop/Tablet) */}
         <button
           onClick={onCopy}
           disabled={isExporting}
-          className={`h-8 px-2.5 sm:px-3 rounded-full text-xs font-medium border transition-all cursor-pointer flex items-center gap-1.5 backdrop-blur-md active:scale-95 ${
+          className={`hidden sm:flex h-8 px-2.5 sm:px-3 rounded-full text-xs font-medium border transition-all cursor-pointer items-center gap-1.5 backdrop-blur-md active:scale-95 ${
             copied
               ? 'bg-zinc-800 border-zinc-600 text-white'
               : 'bg-zinc-900/60 hover:bg-zinc-800 border-white/[0.08] text-zinc-300 hover:text-white'
@@ -219,7 +226,7 @@ export default function Header({
           title="Copy Image to Clipboard"
         >
           {copied ? <Check size={13} className="text-white" /> : <Copy size={13} />}
-          <span className="hidden sm:inline text-[11px]">{copied ? 'Copied!' : 'Copy'}</span>
+          <span className="hidden md:inline text-[11px]">{copied ? 'Copied!' : 'Copy'}</span>
         </button>
 
         {/* Download Pill Button */}
@@ -263,6 +270,22 @@ export default function Header({
                   <div className="flex flex-col leading-tight">
                     <span className="font-semibold">Fullscreen & Screenshot</span>
                     <span className="text-[10px] text-zinc-400">View pure image without UI</span>
+                  </div>
+                </div>
+              </button>
+
+              <button
+                onClick={() => {
+                  setDownloadDropdown(false);
+                  onCopy();
+                }}
+                className="w-full text-left px-3 py-2 rounded-xl text-xs text-white hover:bg-white/10 flex items-center justify-between cursor-pointer transition-colors"
+              >
+                <div className="flex items-center gap-2">
+                  {copied ? <Check size={14} className="text-emerald-400" /> : <Copy size={14} className="text-white" />}
+                  <div className="flex flex-col leading-tight">
+                    <span className="font-semibold">{copied ? 'Copied to Clipboard!' : 'Copy to Clipboard'}</span>
+                    <span className="text-[10px] text-zinc-400">Copy image directly</span>
                   </div>
                 </div>
               </button>

@@ -26,12 +26,16 @@ export default function Sidebar({
   onChange,
   onApplyTheme,
   onResetDefaults,
-  onShowToast
+  onShowToast,
+  savedDraftsList: propDraftsList,
+  onDraftsChange,
+  setCurrentDraftId
 }) {
   const [activeTab, setActiveTab] = useState('content');
   const [bgCategory, setBgCategory] = useState('All');
   const [draftName, setDraftName] = useState('');
-  const [savedDraftsList, setSavedDraftsList] = useState(getSavedDrafts());
+  const [localDraftsList, setLocalDraftsList] = useState(getSavedDrafts);
+  const savedDraftsList = propDraftsList ?? localDraftsList;
   const avatarInputRef = useRef(null);
   const bgInputRef = useRef(null);
 
@@ -62,7 +66,9 @@ export default function Sidebar({
     const name = draftName.trim() || `${config.authorName} - ${config.citation || 'Quote'}`;
     const newDraft = saveDraft(name, config);
     if (newDraft) {
-      setSavedDraftsList(getSavedDrafts());
+      setLocalDraftsList(getSavedDrafts());
+      onDraftsChange?.();
+      setCurrentDraftId?.(newDraft.id);
       setDraftName('');
       onShowToast?.(`Saved "${name}" to local drafts! 💾`);
     }
@@ -70,13 +76,15 @@ export default function Sidebar({
 
   const handleDeleteDraft = (id, name) => {
     const updated = deleteDraft(id);
-    setSavedDraftsList(updated);
+    setLocalDraftsList(updated);
+    onDraftsChange?.();
     onShowToast?.(`Deleted "${name}"`);
   };
 
   const handleLoadDraft = (draft) => {
     onChange({ ...draft.config });
-    onShowToast?.(`Loaded "${draft.name}"`);
+    setCurrentDraftId?.(draft.id);
+    onShowToast?.(`Loaded "${draft.name}"! 🚀`);
   };
 
   const filteredBackgrounds = PRESET_BACKGROUNDS.filter((bg) => {
@@ -158,7 +166,7 @@ export default function Sidebar({
                     type="text"
                     value={config.handle}
                     onChange={(e) => onChange({ handle: e.target.value })}
-                    placeholder="e.g. @vachanamrutquotes"
+                    placeholder="e.g. @vachanamrut.quotes"
                     className="w-full bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-2 text-xs sm:text-sm text-white focus:border-zinc-500 focus:outline-none"
                   />
                 </div>
@@ -446,7 +454,7 @@ export default function Sidebar({
                       type="text"
                       value={config.watermarkText || ''}
                       onChange={(e) => onChange({ watermarkText: e.target.value })}
-                      placeholder="e.g. vachanamrut.in"
+                      placeholder="e.g. vachanamrut.quotes"
                       className="w-full bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-1.5 text-xs text-white focus:border-zinc-500 focus:outline-none"
                     />
                   </div>

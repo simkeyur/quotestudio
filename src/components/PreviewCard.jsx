@@ -48,7 +48,7 @@ const PreviewCard = forwardRef(({ config }, ref) => {
     avatarOffsetX = 0,
     avatarOffsetY = 0,
     authorName = 'Harikrishna Maharaj',
-    handle = '@vachanamrutquotes',
+    handle = '@vachanamrut.quotes',
     isVerified = true,
     badgeColor = '#1d9bf0',
     quoteText = 'પછી શ્રીજીમહારાજ એમ બોલ્યા જે...',
@@ -71,7 +71,7 @@ const PreviewCard = forwardRef(({ config }, ref) => {
     
     // Watermark / Website branding at bottom of image
     showWatermark = true,
-    watermarkText = 'vachanamrut.in',
+    watermarkText = 'vachanamrut.quotes',
     watermarkPosition = 'bottom-right', // 'bottom-right', 'bottom-left', 'bottom-center'
     watermarkStyle = 'pill', // 'pill', 'clean'
     watermarkColor = '#ffffff',
