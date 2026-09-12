@@ -455,7 +455,13 @@ const PreviewCard = forwardRef(({ config }, ref) => {
       {showWatermark && watermarkText && (
         <div
           className={`absolute z-20 pointer-events-none transition-all ${
-            watermarkPosition === 'bottom-left'
+            watermarkPosition === 'top-left'
+              ? 'top-8 left-8'
+              : watermarkPosition === 'top-center'
+              ? 'top-8 left-1/2 -translate-x-1/2'
+              : watermarkPosition === 'top-right'
+              ? 'top-8 right-8'
+              : watermarkPosition === 'bottom-left'
               ? 'bottom-8 left-8'
               : watermarkPosition === 'bottom-center'
               ? 'bottom-8 left-1/2 -translate-x-1/2'

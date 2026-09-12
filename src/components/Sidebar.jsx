@@ -462,19 +462,39 @@ export default function Sidebar({
                   {/* Position selector */}
                   <div>
                     <span className="text-[11px] text-zinc-400 block mb-1">Position</span>
-                    <div className="grid grid-cols-3 gap-1">
+                    <div className="grid grid-cols-3 gap-1 mb-1">
                       {[
-                        { id: 'bottom-left', label: 'Left' },
-                        { id: 'bottom-center', label: 'Center' },
-                        { id: 'bottom-right', label: 'Right' },
+                        { id: 'top-left', label: 'Top Left' },
+                        { id: 'top-center', label: 'Top Center' },
+                        { id: 'top-right', label: 'Top Right' },
                       ].map((pos) => (
                         <button
                           key={pos.id}
                           type="button"
                           onClick={() => onChange({ watermarkPosition: pos.id })}
-                          className={`py-1 text-xs font-medium rounded-md border transition-all cursor-pointer ${
+                          className={`py-1 text-[11px] font-medium rounded-md border transition-all cursor-pointer ${
                             config.watermarkPosition === pos.id
-                              ? 'bg-white text-black border-white shadow'
+                              ? 'bg-white text-black border-white shadow font-semibold'
+                              : 'bg-zinc-900 border-zinc-800 text-zinc-400 hover:text-white'
+                          }`}
+                        >
+                          {pos.label}
+                        </button>
+                      ))}
+                    </div>
+                    <div className="grid grid-cols-3 gap-1">
+                      {[
+                        { id: 'bottom-left', label: 'Bottom Left' },
+                        { id: 'bottom-center', label: 'Bottom Center' },
+                        { id: 'bottom-right', label: 'Bottom Right' },
+                      ].map((pos) => (
+                        <button
+                          key={pos.id}
+                          type="button"
+                          onClick={() => onChange({ watermarkPosition: pos.id })}
+                          className={`py-1 text-[11px] font-medium rounded-md border transition-all cursor-pointer ${
+                            config.watermarkPosition === pos.id
+                              ? 'bg-white text-black border-white shadow font-semibold'
                               : 'bg-zinc-900 border-zinc-800 text-zinc-400 hover:text-white'
                           }`}
                         >
