@@ -53,7 +53,7 @@ const INITIAL_DEFAULT_CONFIG = {
 
   // Watermark / Website Branding
   showWatermark: true,
-  watermarkText: 'vachanamrut.quotes',
+  watermarkText: 'vachanamrut.in',
   watermarkPosition: 'bottom-right',
   watermarkStyle: 'pill',
   watermarkColor: '#ffffff',
@@ -102,8 +102,8 @@ export default function App() {
     if (!loaded.avatarUrl || loaded.avatarUrl.includes('person_avatar') || loaded.avatarUrl.includes('maharaj_1')) {
       loaded.avatarUrl = 'defaults/avatars/harikrishna-1.jpg';
     }
-    if (!loaded.watermarkText || loaded.watermarkText === 'vachanamrut.in') {
-      loaded.watermarkText = 'vachanamrut.quotes';
+    if (!loaded.watermarkText || loaded.watermarkText === 'vachanamrut.quotes') {
+      loaded.watermarkText = 'vachanamrut.in';
     }
     if (!loaded.handle || loaded.handle === '@vachanamrutquotes') {
       loaded.handle = '@vachanamrut.quotes';

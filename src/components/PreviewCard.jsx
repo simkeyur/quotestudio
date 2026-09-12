@@ -71,7 +71,7 @@ const PreviewCard = forwardRef(({ config }, ref) => {
     
     // Watermark / Website branding at bottom of image
     showWatermark = true,
-    watermarkText = 'vachanamrut.quotes',
+    watermarkText = 'vachanamrut.in',
     watermarkPosition = 'bottom-right', // 'bottom-right', 'bottom-left', 'bottom-center'
     watermarkStyle = 'pill', // 'pill', 'clean'
     watermarkColor = '#ffffff',
@@ -456,10 +456,10 @@ const PreviewCard = forwardRef(({ config }, ref) => {
         <div
           className={`absolute z-20 pointer-events-none transition-all ${
             watermarkPosition === 'bottom-left'
-              ? 'bottom-4 left-6'
+              ? 'bottom-8 left-8'
               : watermarkPosition === 'bottom-center'
-              ? 'bottom-4 left-1/2 -translate-x-1/2'
-              : 'bottom-4 right-6'
+              ? 'bottom-8 left-1/2 -translate-x-1/2'
+              : 'bottom-8 right-8'
           }`}
         >
           <div

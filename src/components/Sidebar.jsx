@@ -454,7 +454,7 @@ export default function Sidebar({
                       type="text"
                       value={config.watermarkText || ''}
                       onChange={(e) => onChange({ watermarkText: e.target.value })}
-                      placeholder="e.g. vachanamrut.quotes"
+                      placeholder="e.g. vachanamrut.in"
                       className="w-full bg-zinc-900 border border-zinc-800 rounded-lg px-3 py-1.5 text-xs text-white focus:border-zinc-500 focus:outline-none"
                     />
                   </div>
