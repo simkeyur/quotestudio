@@ -75,6 +75,29 @@ const INITIAL_DEFAULT_CONFIG = {
   citationColor: '#374151',
   citationFontSize: 18,
   citationFontWeight: 600,
+
+  // Mode: 'social' | 'geeta'
+  cardMode: 'social',
+
+  // Bhagavad Gita Two-Box Configuration
+  geetaChapter: 2,
+  geetaVerse: 47,
+  geetaLanguage: 'gujarati', // 'english', 'gujarati', 'hindi'
+  geetaShloka: 'कर्मण्येवाधिकारस्ते मा फलेषु कदाचन।\n\nमा कर्मफलहेतुर्भूर्मा ते सङ्गोऽस्त्वकर्मणि।।2.47।।',
+  geetaTranslation: 'કર્મ કરવા ઉપર જ તમારો અધિકાર છે, તેના ફળો પર ક્યારેય નહીં. તમે ક્યારેય કર્મફળના હેતુરૂપ ન બનો અને તમારી અકર્મમાં પણ આસક્તિ ન હોય.',
+  geetaTransliteration: 'karmaṇy-evādhikāras te mā phaleṣhu kadāchana\nmā karma-phala-hetur bhūr mā te saṅgo ’stvakarmaṇi',
+  geetaShowHeader: true,
+  geetaShowTranslationTag: true,
+  geetaBoxGap: 24,
+  geetaShlokaFontSize: 24,
+  geetaTranslationFontSize: 18,
+  geetaShlokaFont: "'Rozha One', serif",
+  geetaTranslationFont: "'Mukta Vaani', sans-serif",
+  geetaShlokaColor: '#111827',
+  geetaTranslationColor: '#1f2937',
+  geetaHeaderColor: '#b45309',
+  geetaTagColor: '#6b7280',
+  geetaTextAlign: 'center',
 };
 
 function getCanvasDimensions(aspectRatio) {
@@ -296,11 +319,13 @@ export default function App() {
   // Save current quote card to local drafts & localStorage
   const handleSave = () => {
     saveActiveState(config);
-    const quoteSnippet = config.quoteText?.trim()
-      ? (config.quoteText.trim().length > 32
-          ? `"${config.quoteText.trim().slice(0, 32)}..."`
-          : `"${config.quoteText.trim()}"`)
-      : `${config.authorName || 'Quote'} (${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })})`;
+    const quoteSnippet = config.cardMode === 'geeta'
+      ? `Gita ${config.geetaChapter}.${config.geetaVerse}: "${(config.geetaTranslation || config.geetaShloka || '').trim().slice(0, 30)}..."`
+      : config.quoteText?.trim()
+        ? (config.quoteText.trim().length > 32
+            ? `"${config.quoteText.trim().slice(0, 32)}..."`
+            : `"${config.quoteText.trim()}"`)
+        : `${config.authorName || 'Quote'} (${new Date().toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })})`;
 
     const savedDraft = saveDraft(quoteSnippet, config, currentDraftId);
     if (savedDraft) {
@@ -384,7 +409,9 @@ export default function App() {
       const isJpeg = format === 'jpeg' || format === 'jpg';
       const mimeType = isJpeg ? 'image/jpeg' : 'image/png';
       const ext = isJpeg ? 'jpg' : 'png';
-      const cleanAuthor = (config.authorName || 'quote').toLowerCase().replace(/[^a-z0-9]+/g, '-');
+      const cleanAuthor = config.cardMode === 'geeta'
+        ? `bhagavad-gita-${config.geetaChapter}-${config.geetaVerse}`
+        : (config.authorName || 'quote').toLowerCase().replace(/[^a-z0-9]+/g, '-');
       const filename = `${cleanAuthor}-${Date.now()}.${ext}`;
 
       const options = {
@@ -527,6 +554,23 @@ export default function App() {
 
       {/* Top Header Navbar */}
       <Header
+        cardMode={config.cardMode || 'social'}
+        onModeChange={(newMode) => {
+          if (newMode === 'geeta') {
+            handleConfigChange({
+              cardMode: 'geeta',
+              aspectRatio: '9:16',
+              watermarkText: config.watermarkText === 'vachanamrut.in' ? 'gitagyan.in' : (config.watermarkText || 'gitagyan.in')
+            });
+            showToast('Bhagavad Gita Mode (9:16) 🕉️');
+          } else {
+            handleConfigChange({
+              cardMode: 'social',
+              watermarkText: config.watermarkText === 'gitagyan.in' ? 'vachanamrut.in' : (config.watermarkText || 'vachanamrut.in')
+            });
+            showToast('Social Quote Mode ✨');
+          }
+        }}
         aspectRatio={config.aspectRatio}
         onAspectRatioChange={(ratio) => handleConfigChange({ aspectRatio: ratio })}
         onExport={handleExport}

@@ -1,8 +1,10 @@
 import React, { forwardRef } from 'react';
 import VerifiedBadge from './VerifiedBadge';
+import { formatGitaHeader, cleanShlokaDisplay } from '../services/geetaService';
 
 const PreviewCard = forwardRef(({ config }, ref) => {
   const {
+    cardMode = 'social',
     aspectRatio = '4:5',
     background = 'backgrounds/IMG_8205.jpg',
     isGradientBg = false,
@@ -36,7 +38,7 @@ const PreviewCard = forwardRef(({ config }, ref) => {
     onResizePointerMove,
     onResizePointerUp,
     
-    // Avatar Ring & Profile
+    // Avatar Ring & Profile (Social Mode)
     avatarUrl = 'avatars/harikrishna.jpg',
     avatarSvg = '',
     avatarRingType = 'gold', // 'gold', 'black', 'white', 'none', 'custom'
@@ -55,6 +57,25 @@ const PreviewCard = forwardRef(({ config }, ref) => {
     citation = '(ગઢડા અંત્ય ૩૬)',
     showCitation = true,
     
+    // Bhagavad Gita Dedicated Fields
+    geetaChapter = 2,
+    geetaVerse = 47,
+    geetaLanguage = 'gujarati',
+    geetaShloka = 'कर्मण्येवाधिकारस्ते मा फलेषु कदाचन।\n\nमा कर्मफलहेतुर्भूर्मा ते सङ्गोऽस्त्वकर्मणि।।2.47।।',
+    geetaTranslation = 'કર્મ કરવા ઉપર જ તમારો અધિકાર છે, તેના ફળો પર ક્યારેય નહીં. તમે ક્યારેય કર્મફળના હેતુરૂપ ન બનો અને તમારી અકર્મમાં પણ આસક્તિ ન હોય.',
+    geetaShowHeader = true,
+    geetaShowTranslationTag = true,
+    geetaBoxGap = 24,
+    geetaShlokaFontSize = 24,
+    geetaTranslationFontSize = 18,
+    geetaShlokaFont = "'Noto Serif Devanagari', serif",
+    geetaTranslationFont = "'Mukta Vaani', sans-serif",
+    geetaShlokaColor,
+    geetaTranslationColor,
+    geetaHeaderColor,
+    geetaTagColor,
+    geetaTextAlign = 'center',
+
     // Typography
     fontFamily = "'Mukta Vaani', sans-serif",
     fontWeight = 500,
@@ -213,12 +234,12 @@ const PreviewCard = forwardRef(({ config }, ref) => {
             width: `${cardWidth}%`,
             transform: `translate(-${cardPositionX ?? 50}%, -${cardPositionY ?? 50}%)`,
             borderRadius: `${cardRadius * 1.5}px`,
-            backgroundColor: hexToRgba(cardBg, cardOpacity),
-            backdropFilter: cardBlur > 0 ? `blur(${cardBlur}px)` : 'none',
-            WebkitBackdropFilter: cardBlur > 0 ? `blur(${cardBlur}px)` : 'none',
-            boxShadow: getShadowStyle(),
-            border: borderWidth > 0 ? `${borderWidth}px solid ${borderColor}` : 'none',
-            padding: '44px 44px',
+            backgroundColor: cardMode === 'geeta' ? 'transparent' : hexToRgba(cardBg, cardOpacity),
+            backdropFilter: cardMode === 'geeta' ? 'none' : (cardBlur > 0 ? `blur(${cardBlur}px)` : 'none'),
+            WebkitBackdropFilter: cardMode === 'geeta' ? 'none' : (cardBlur > 0 ? `blur(${cardBlur}px)` : 'none'),
+            boxShadow: cardMode === 'geeta' ? 'none' : getShadowStyle(),
+            border: cardMode === 'geeta' ? 'none' : (borderWidth > 0 ? `${borderWidth}px solid ${borderColor}` : 'none'),
+            padding: cardMode === 'geeta' ? '0px' : '44px 44px',
             touchAction: 'none',
           }}
         >
@@ -308,145 +329,252 @@ const PreviewCard = forwardRef(({ config }, ref) => {
             </div>
           )}
 
-          {/* Header Row: Avatar, Name, Handle, Verified Badge */}
-          <div className="flex items-center gap-4 mb-6">
-            {/* Avatar Container with Golden / Black / Custom Ring & Centering */}
-            {(() => {
-              let ringBg = 'transparent';
-              let ringShadow = '0 2px 10px rgba(0,0,0,0.18)';
-              let pad = `${avatarRingWidth}px`;
+          {/* Inside Card: Bhagavad Gita Two-Box Layout vs Social Quote Layout */}
+          {cardMode === 'geeta' ? (
+            <div className="flex flex-col w-full pointer-events-auto" style={{ gap: `${geetaBoxGap ?? 24}px` }}>
+              {/* Box 1: Sanskrit Shloka Box */}
+              <div
+                id="geeta-box-sloka"
+                style={{
+                  width: '100%',
+                  borderRadius: `${cardRadius * 1.5}px`,
+                  backgroundColor: hexToRgba(cardBg, cardOpacity),
+                  backdropFilter: cardBlur > 0 ? `blur(${cardBlur}px)` : 'none',
+                  WebkitBackdropFilter: cardBlur > 0 ? `blur(${cardBlur}px)` : 'none',
+                  boxShadow: getShadowStyle(),
+                  border: borderWidth > 0 ? `${borderWidth}px solid ${borderColor}` : 'none',
+                  padding: '38px 44px',
+                }}
+                className="transition-all duration-150 relative overflow-hidden"
+              >
+                {/* Chapter & Verse Header Badge */}
+                {geetaShowHeader && (
+                  <div className="flex items-center justify-center mb-4">
+                    <span
+                      style={{
+                        fontFamily: "'Noto Serif Devanagari', serif",
+                        color: geetaHeaderColor || '#b45309',
+                        fontSize: '20px',
+                        fontWeight: 700,
+                        letterSpacing: '1px',
+                      }}
+                      className="select-none tracking-wide text-center"
+                    >
+                      {formatGitaHeader(geetaChapter, geetaVerse, true)}
+                    </span>
+                  </div>
+                )}
 
-              if (avatarRingType === 'gold') {
-                ringBg = 'linear-gradient(135deg, #d97706 0%, #b45309 30%, #78350f 60%, #b45309 80%, #451a03 100%)';
-                ringShadow = avatarRingGlow
-                  ? '0 0 16px rgba(180, 83, 9, 0.55), 0 2px 8px rgba(0,0,0,0.4)'
-                  : '0 2px 8px rgba(0,0,0,0.35)';
-              } else if (avatarRingType === 'black') {
-                ringBg = '#000000';
-                ringShadow = '0 3px 12px rgba(0,0,0,0.45)';
-              } else if (avatarRingType === 'white') {
-                ringBg = '#ffffff';
-                ringShadow = '0 3px 12px rgba(0,0,0,0.25)';
-              } else if (avatarRingType === 'custom') {
-                ringBg = avatarRingColor || '#d4af37';
-                ringShadow = '0 2px 10px rgba(0,0,0,0.2)';
-              } else {
-                pad = '0px';
-                ringShadow = '0 2px 8px rgba(0,0,0,0.12)';
-              }
-
-              const totalDim = avatarSize * 1.5;
-
-              return (
+                {/* Sanskrit Shloka Text */}
                 <div
                   style={{
-                    width: `${totalDim}px`,
-                    height: `${totalDim}px`,
-                    background: ringBg,
-                    padding: pad,
-                    borderRadius: '9999px',
-                    boxShadow: ringShadow,
+                    fontFamily: geetaShlokaFont || "'Rozha One', serif",
+                    fontWeight: 500,
+                    fontSize: `${geetaShlokaFontSize * 1.55}px`,
+                    lineHeight: 1.75,
+                    letterSpacing: '0.4px',
+                    textAlign: geetaTextAlign || 'center',
+                    color: geetaShlokaColor || textColor,
+                    whiteSpace: 'pre-line',
                   }}
-                  className="relative shrink-0 flex items-center justify-center transition-all duration-150"
+                  className="tracking-normal break-words select-none"
                 >
-                  <div className="w-full h-full rounded-full overflow-hidden bg-black/10 relative">
-                    {avatarSvg ? (
-                      <img
-                        src={avatarSvg}
-                        alt="Avatar"
-                        crossOrigin="anonymous"
-                        style={{
-                          transform: `scale(${avatarZoom / 100}) translate(${avatarOffsetX}%, ${avatarOffsetY}%)`,
-                          transformOrigin: 'center center',
-                        }}
-                        className="w-full h-full object-cover transition-transform"
-                      />
-                    ) : (
-                      <img
-                        src={avatarUrl || 'defaults/avatars/harikrishna-1.jpg'}
-                        alt={authorName}
-                        crossOrigin="anonymous"
-                        style={{
-                          transform: `scale(${avatarZoom / 100}) translate(${avatarOffsetX}%, ${avatarOffsetY}%)`,
-                          transformOrigin: 'center center',
-                        }}
-                        className="w-full h-full object-cover transition-transform"
-                      />
-                    )}
-                  </div>
+                  {cleanShlokaDisplay(geetaShloka)}
                 </div>
-              );
-            })()}
-
-            {/* Author info */}
-            <div className="flex-1 flex flex-col justify-center min-w-0">
-              <div className="flex items-center gap-2">
-                <span
-                  style={{
-                    color: nameColor,
-                    fontSize: '24px',
-                    fontWeight: 700,
-                    fontFamily: "'Plus Jakarta Sans', sans-serif",
-                    lineHeight: 1.2,
-                  }}
-                  className="truncate"
-                >
-                  {authorName}
-                </span>
-                {isVerified && (
-                  <VerifiedBadge color={badgeColor} size={20} className="shrink-0" />
-                )}
               </div>
 
-              {handle && (
-                <span
+              {/* Box 2: Translation Box */}
+              <div
+                id="geeta-box-translation"
+                style={{
+                  width: '100%',
+                  borderRadius: `${cardRadius * 1.5}px`,
+                  backgroundColor: hexToRgba(cardBg, cardOpacity),
+                  backdropFilter: cardBlur > 0 ? `blur(${cardBlur}px)` : 'none',
+                  WebkitBackdropFilter: cardBlur > 0 ? `blur(${cardBlur}px)` : 'none',
+                  boxShadow: getShadowStyle(),
+                  border: borderWidth > 0 ? `${borderWidth}px solid ${borderColor}` : 'none',
+                  padding: '36px 44px',
+                }}
+                className="transition-all duration-150 relative overflow-hidden"
+              >
+                {/* Translation Tag */}
+                {geetaShowTranslationTag && (
+                  <div className="flex items-center justify-center mb-3.5">
+                    <span
+                      style={{
+                        color: geetaTagColor || '#6b7280',
+                        fontSize: '13px',
+                        fontWeight: 700,
+                        letterSpacing: '2px',
+                      }}
+                      className="select-none tracking-widest text-center opacity-85 uppercase"
+                    >
+                      {geetaLanguage === 'gujarati' ? 'ભાવાર્થ / TRANSLATION' : geetaLanguage === 'hindi' ? 'भावार्थ / TRANSLATION' : 'TRANSLATION'}
+                    </span>
+                  </div>
+                )}
+
+                {/* Translation Text */}
+                <div
                   style={{
-                    color: handleColor,
-                    fontSize: '18px',
-                    fontWeight: 400,
-                    fontFamily: "'Plus Jakarta Sans', sans-serif",
-                    lineHeight: 1.2,
+                    fontFamily: geetaTranslationFont || fontFamily,
+                    fontWeight: fontWeight || 500,
+                    fontSize: `${geetaTranslationFontSize * 1.5}px`,
+                    lineHeight: 1.65,
+                    textAlign: geetaTextAlign || 'center',
+                    color: geetaTranslationColor || textColor,
+                    whiteSpace: 'pre-line',
                   }}
-                  className="mt-1 tracking-tight truncate block"
+                  className="tracking-normal break-words select-none"
                 >
-                  {handle}
-                </span>
+                  {geetaTranslation}
+                </div>
+              </div>
+            </div>
+          ) : (
+            <>
+              {/* Header Row: Avatar, Name, Handle, Verified Badge */}
+              <div className="flex items-center gap-4 mb-6">
+                {/* Avatar Container with Golden / Black / Custom Ring & Centering */}
+                {(() => {
+                  let ringBg = 'transparent';
+                  let ringShadow = '0 2px 10px rgba(0,0,0,0.18)';
+                  let pad = `${avatarRingWidth}px`;
+
+                  if (avatarRingType === 'gold') {
+                    ringBg = 'linear-gradient(135deg, #d97706 0%, #b45309 30%, #78350f 60%, #b45309 80%, #451a03 100%)';
+                    ringShadow = avatarRingGlow
+                      ? '0 0 16px rgba(180, 83, 9, 0.55), 0 2px 8px rgba(0,0,0,0.4)'
+                      : '0 2px 8px rgba(0,0,0,0.35)';
+                  } else if (avatarRingType === 'black') {
+                    ringBg = '#000000';
+                    ringShadow = '0 3px 12px rgba(0,0,0,0.45)';
+                  } else if (avatarRingType === 'white') {
+                    ringBg = '#ffffff';
+                    ringShadow = '0 3px 12px rgba(0,0,0,0.25)';
+                  } else if (avatarRingType === 'custom') {
+                    ringBg = avatarRingColor || '#d4af37';
+                    ringShadow = '0 2px 10px rgba(0,0,0,0.2)';
+                  } else {
+                    pad = '0px';
+                    ringShadow = '0 2px 8px rgba(0,0,0,0.12)';
+                  }
+
+                  const totalDim = avatarSize * 1.5;
+
+                  return (
+                    <div
+                      style={{
+                        width: `${totalDim}px`,
+                        height: `${totalDim}px`,
+                        background: ringBg,
+                        padding: pad,
+                        borderRadius: '9999px',
+                        boxShadow: ringShadow,
+                      }}
+                      className="relative shrink-0 flex items-center justify-center transition-all duration-150"
+                    >
+                      <div className="w-full h-full rounded-full overflow-hidden bg-black/10 relative">
+                        {avatarSvg ? (
+                          <img
+                            src={avatarSvg}
+                            alt="Avatar"
+                            crossOrigin="anonymous"
+                            style={{
+                              transform: `scale(${avatarZoom / 100}) translate(${avatarOffsetX}%, ${avatarOffsetY}%)`,
+                              transformOrigin: 'center center',
+                            }}
+                            className="w-full h-full object-cover transition-transform"
+                          />
+                        ) : (
+                          <img
+                            src={avatarUrl || 'defaults/avatars/harikrishna-1.jpg'}
+                            alt={authorName}
+                            crossOrigin="anonymous"
+                            style={{
+                              transform: `scale(${avatarZoom / 100}) translate(${avatarOffsetX}%, ${avatarOffsetY}%)`,
+                              transformOrigin: 'center center',
+                            }}
+                            className="w-full h-full object-cover transition-transform"
+                          />
+                        )}
+                      </div>
+                    </div>
+                  );
+                })()}
+
+                {/* Author info */}
+                <div className="flex-1 flex flex-col justify-center min-w-0">
+                  <div className="flex items-center gap-2">
+                    <span
+                      style={{
+                        color: nameColor,
+                        fontSize: '24px',
+                        fontWeight: 700,
+                        fontFamily: "'Plus Jakarta Sans', sans-serif",
+                        lineHeight: 1.2,
+                      }}
+                      className="truncate"
+                    >
+                      {authorName}
+                    </span>
+                    {isVerified && (
+                      <VerifiedBadge color={badgeColor} size={20} className="shrink-0" />
+                    )}
+                  </div>
+
+                  {handle && (
+                    <span
+                      style={{
+                        color: handleColor,
+                        fontSize: '18px',
+                        fontWeight: 400,
+                        fontFamily: "'Plus Jakarta Sans', sans-serif",
+                        lineHeight: 1.2,
+                      }}
+                      className="mt-1 tracking-tight truncate block"
+                    >
+                      {handle}
+                    </span>
+                  )}
+                </div>
+              </div>
+
+              {/* Quote Body */}
+              <div
+                style={{
+                  fontFamily: fontFamily,
+                  fontWeight: fontWeight,
+                  fontSize: `${fontSize * 1.55}px`,
+                  lineHeight: lineHeight,
+                  letterSpacing: `${letterSpacing}px`,
+                  textAlign: textAlign,
+                  color: textColor,
+                  whiteSpace: 'pre-line',
+                }}
+                className="tracking-normal break-words"
+              >
+                {quoteText}
+              </div>
+
+              {/* Citation / Reference */}
+              {showCitation && citation && (
+                <div
+                  style={{
+                    fontFamily: fontFamily,
+                    fontWeight: citationFontWeight,
+                    fontSize: `${citationFontSize * 1.45}px`,
+                    color: citationColor,
+                    textAlign: textAlign === 'right' ? 'right' : 'left',
+                    marginTop: '20px'
+                  }}
+                  className="tracking-wide"
+                >
+                  {citation}
+                </div>
               )}
-            </div>
-          </div>
-
-          {/* Quote Body */}
-          <div
-            style={{
-              fontFamily: fontFamily,
-              fontWeight: fontWeight,
-              fontSize: `${fontSize * 1.55}px`,
-              lineHeight: lineHeight,
-              letterSpacing: `${letterSpacing}px`,
-              textAlign: textAlign,
-              color: textColor,
-              whiteSpace: 'pre-line',
-            }}
-            className="tracking-normal break-words"
-          >
-            {quoteText}
-          </div>
-
-          {/* Citation / Reference */}
-          {showCitation && citation && (
-            <div
-              style={{
-                fontFamily: fontFamily,
-                fontWeight: citationFontWeight,
-                fontSize: `${citationFontSize * 1.45}px`,
-                color: citationColor,
-                textAlign: textAlign === 'right' ? 'right' : 'left',
-                marginTop: '20px'
-              }}
-              className="tracking-wide"
-            >
-              {citation}
-            </div>
+            </>
           )}
         </div>
       </div>

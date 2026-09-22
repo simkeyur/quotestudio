@@ -15,11 +15,15 @@ import {
   Maximize2,
   Share2,
   Eye,
-  Save
+  Save,
+  BookOpen,
+  MessageSquareQuote
 } from 'lucide-react';
 import { ASPECT_RATIOS } from '../constants/fonts';
 
 export default function Header({
+  cardMode = 'social',
+  onModeChange,
   aspectRatio,
   onAspectRatioChange,
   onExport,
@@ -56,19 +60,50 @@ export default function Header({
   const currentRatioObj = ASPECT_RATIOS.find((r) => r.id === aspectRatio) || ASPECT_RATIOS[0];
 
   return (
-    <header className="h-16 border-b border-white/[0.06] bg-black/60 backdrop-blur-xl px-3 sm:px-6 flex items-center justify-between z-30 shrink-0 select-none transition-all">
-      {/* Brand & Logo */}
-      <div className="flex items-center gap-2 sm:gap-2.5 shrink-0">
+    <header className="h-16 border-b border-white/[0.06] bg-black/60 backdrop-blur-xl px-3 sm:px-6 flex items-center justify-between z-30 shrink-0 select-none transition-all gap-2">
+      {/* Brand & Mode Switcher */}
+      <div className="flex items-center gap-2 sm:gap-3 shrink-0">
         <img
           src="./logo.png"
           alt="Quote Studio"
           className="w-7 h-7 sm:w-8 sm:h-8 rounded-lg shadow-md ring-1 ring-white/10 object-cover shrink-0"
         />
-        <div className="min-w-0">
+        <div className="min-w-0 hidden xl:block">
           <h1 className="text-xs sm:text-sm font-bold text-white tracking-tight flex items-center gap-1.5 truncate">
-            Quote Studio
+            {cardMode === 'geeta' ? 'Gita Studio' : 'Quote Studio'}
           </h1>
-          <p className="text-[10px] text-zinc-400 hidden sm:block">Minimalist Social Card Studio</p>
+          <p className="text-[10px] text-zinc-400">
+            {cardMode === 'geeta' ? 'Bhagavad Gita 9:16 Creator' : 'Social Card Studio'}
+          </p>
+        </div>
+
+        {/* Studio Mode Switcher */}
+        <div className="flex items-center bg-zinc-900/90 p-0.5 rounded-full border border-white/[0.1] shadow-inner">
+          <button
+            onClick={() => onModeChange?.('social')}
+            className={`flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3 py-1 rounded-full text-xs transition-all cursor-pointer ${
+              cardMode === 'social'
+                ? 'bg-white text-black shadow-sm font-bold'
+                : 'text-zinc-400 hover:text-white hover:bg-white/[0.06]'
+            }`}
+            title="Social Quote Card with Avatar & Verified badge"
+          >
+            <MessageSquareQuote size={12} />
+            <span className="text-[11px] font-medium">Quote</span>
+          </button>
+
+          <button
+            onClick={() => onModeChange?.('geeta')}
+            className={`flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3 py-1 rounded-full text-xs transition-all cursor-pointer ${
+              cardMode === 'geeta'
+                ? 'bg-amber-400 text-black shadow-sm font-bold'
+                : 'text-zinc-400 hover:text-white hover:bg-white/[0.06]'
+            }`}
+            title="Bhagavad Gita 9:16 (Two Boxes: Sanskrit Sloka + Translation)"
+          >
+            <BookOpen size={12} />
+            <span className="text-[11px] font-medium">Gita 9:16</span>
+          </button>
         </div>
       </div>
 
@@ -188,15 +223,15 @@ export default function Header({
 
       {/* Actions (Free, Airy Pill Buttons) */}
       <div className="flex items-center gap-1.5 sm:gap-2">
-        {/* Fullscreen Preview / Screenshot Modal Button */}
+        {/* Fullscreen Preview / Screenshot Modal Button - Prominent on Phone & Desktop */}
         <button
           onClick={onOpenFullscreen}
           disabled={isExporting}
-          className="flex h-8 px-2.5 sm:px-3 rounded-full bg-zinc-900/60 hover:bg-zinc-800 text-zinc-200 hover:text-white border border-white/[0.12] text-xs font-semibold transition-all cursor-pointer items-center gap-1.5 backdrop-blur-md active:scale-95 shadow-sm"
+          className="flex h-8 px-2.5 sm:px-3 rounded-full bg-zinc-900/80 hover:bg-zinc-800 text-zinc-200 hover:text-white border border-white/[0.16] text-xs font-semibold transition-all cursor-pointer items-center gap-1.5 backdrop-blur-md active:scale-95 shadow-sm"
           title="Fullscreen Preview & Screenshot"
         >
-          <Eye size={13} className="text-white" />
-          <span className="hidden sm:inline text-[11px]">Preview</span>
+          <Eye size={13} className="text-amber-400 sm:text-white" />
+          <span className="text-[11px] font-semibold">Preview</span>
         </button>
 
         {/* Save Draft */}
@@ -214,11 +249,11 @@ export default function Header({
           <span className="hidden sm:inline text-[11px]">{saved ? 'Saved!' : 'Save'}</span>
         </button>
 
-        {/* Copy to Clipboard (Desktop/Tablet) */}
+        {/* Copy to Clipboard - Hidden on Phone (< md:) */}
         <button
           onClick={onCopy}
           disabled={isExporting}
-          className={`hidden sm:flex h-8 px-2.5 sm:px-3 rounded-full text-xs font-medium border transition-all cursor-pointer items-center gap-1.5 backdrop-blur-md active:scale-95 ${
+          className={`hidden md:flex h-8 px-2.5 sm:px-3 rounded-full text-xs font-medium border transition-all cursor-pointer items-center gap-1.5 backdrop-blur-md active:scale-95 ${
             copied
               ? 'bg-zinc-800 border-zinc-600 text-white'
               : 'bg-zinc-900/60 hover:bg-zinc-800 border-white/[0.08] text-zinc-300 hover:text-white'
@@ -226,11 +261,11 @@ export default function Header({
           title="Copy Image to Clipboard"
         >
           {copied ? <Check size={13} className="text-white" /> : <Copy size={13} />}
-          <span className="hidden md:inline text-[11px]">{copied ? 'Copied!' : 'Copy'}</span>
+          <span className="text-[11px]">{copied ? 'Copied!' : 'Copy'}</span>
         </button>
 
-        {/* Download Pill Button */}
-        <div className="relative">
+        {/* Download Pill Button (PNG) - Hidden on Phone (< md:) */}
+        <div className="relative hidden md:block">
           <div className="inline-flex rounded-full shadow-md bg-white overflow-hidden p-0.5">
             <button
               onClick={() => onExport('png')}

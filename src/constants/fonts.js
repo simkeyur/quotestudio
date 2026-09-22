@@ -1,4 +1,98 @@
+export const SANSKRIT_FONTS = [
+  {
+    id: 'rozha-one',
+    name: 'Rozha One (Traditional Divine Bold)',
+    fontFamily: "'Rozha One', serif",
+    weights: [400],
+    defaultWeight: 400,
+    preview: 'कर्मण्येवाधिकारस्ते मा फलेषु कदाचन'
+  },
+  {
+    id: 'yatra-one',
+    name: 'Yatra One (Heritage Calligraphic)',
+    fontFamily: "'Yatra One', cursive",
+    weights: [400],
+    defaultWeight: 400,
+    preview: 'यदा यदा हि धर्मस्य ग्लानिर्भवति भारत'
+  },
+  {
+    id: 'tiro-devanagari',
+    name: 'Tiro Devanagari (Vedic Classical Scripture)',
+    fontFamily: "'Tiro Devanagari Sanskrit', serif",
+    weights: [400],
+    defaultWeight: 400,
+    preview: 'न जायते म्रियते वा कदाचिन्'
+  },
+  {
+    id: 'martel',
+    name: 'Martel (Sacred Royal Serif)',
+    fontFamily: "'Martel', serif",
+    weights: [400, 600, 700, 800, 900],
+    defaultWeight: 700,
+    preview: 'परित्राणाय साधूनां विनाशाय च दुष्कृताम्'
+  },
+  {
+    id: 'gotu',
+    name: 'Gotu (Modern Curved Sanskrit)',
+    fontFamily: "'Gotu', sans-serif",
+    weights: [400],
+    defaultWeight: 400,
+    preview: 'वासांसि जीर्णानि यथा विहाय'
+  },
+  {
+    id: 'kalam',
+    name: 'Kalam (Spiritual Calligraphy)',
+    fontFamily: "'Kalam', cursive",
+    weights: [400, 700],
+    defaultWeight: 700,
+    preview: 'अनन्याश्चिन्तयन्तो मां ये जनाः पर्युपासते'
+  },
+  {
+    id: 'noto-serif-devanagari',
+    name: 'Noto Serif Devanagari (Classical Book)',
+    fontFamily: "'Noto Serif Devanagari', serif",
+    weights: [400, 600, 700, 800, 900],
+    defaultWeight: 600,
+    preview: 'सर्वधर्मान्परित्यज्य मामेकं शरणं व्रज'
+  },
+  {
+    id: 'mukta-vaani',
+    name: 'Mukta Vaani (Clean Devanagari)',
+    fontFamily: "'Mukta Vaani', sans-serif",
+    weights: [400, 500, 600, 700, 800],
+    defaultWeight: 600,
+    preview: 'मन्मना भव मद्भक्तो मद्याजी मां नमस्कुरु'
+  }
+];
+
 export const FONTS = [
+  {
+    id: 'rozha-one',
+    name: 'Rozha One',
+    fontFamily: "'Rozha One', serif",
+    language: 'Sanskrit / Devanagari Bold',
+    weights: [400],
+    defaultWeight: 400,
+    preview: 'श्रीमद्भगवद्गीता'
+  },
+  {
+    id: 'yatra-one',
+    name: 'Yatra One',
+    fontFamily: "'Yatra One', cursive",
+    language: 'Sanskrit / Calligraphic',
+    weights: [400],
+    defaultWeight: 400,
+    preview: 'कर्मण्येवाधिकारस्ते'
+  },
+  {
+    id: 'noto-serif-devanagari',
+    name: 'Noto Serif Devanagari',
+    fontFamily: "'Noto Serif Devanagari', serif",
+    language: 'Sanskrit / Devanagari Classical',
+    weights: [400, 600, 700],
+    defaultWeight: 600,
+    preview: 'कर्मण्येवाधिकारस्ते मा फलेषु कदाचन'
+  },
   {
     id: 'mukta-vaani',
     name: 'Mukta Vaani',
