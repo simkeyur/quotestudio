@@ -537,14 +537,14 @@ export default function Sidebar({
                   />
                 </div>
 
-                {/* Box 2: Translation Textarea */}
-                <div className="p-3.5 bg-zinc-900/70 rounded-xl border border-zinc-800 space-y-2">
+                {/* Box 2: Translation Textarea & Enhanced Font Size Controls */}
+                <div className="p-3.5 bg-zinc-900/70 rounded-xl border border-zinc-800 space-y-3">
                   <div className="flex items-center justify-between">
                     <label className="text-xs font-semibold text-zinc-300 uppercase tracking-wider block">
                       Box 2: Translation ({currentLang.toUpperCase()})
                     </label>
                     <div className="flex items-center gap-1.5 text-[11px] text-zinc-400 font-mono">
-                      <span>Size: {config.geetaTranslationFontSize ?? 18}px</span>
+                      <span>Size: {config.geetaTranslationFontSize ?? 22}px</span>
                     </div>
                   </div>
                   <textarea
@@ -554,16 +554,74 @@ export default function Sidebar({
                     placeholder="Verse Translation..."
                     className="w-full bg-zinc-950 border border-zinc-700/90 rounded-lg p-3 text-xs sm:text-sm text-white focus:border-amber-400 focus:outline-none resize-y leading-relaxed"
                   />
-                  <input
-                    type="range"
-                    min="14"
-                    max="26"
-                    step="1"
-                    value={config.geetaTranslationFontSize ?? 18}
-                    onChange={(e) => onChange({ geetaTranslationFontSize: parseInt(e.target.value, 10) })}
-                    className="w-full accent-amber-400 cursor-pointer"
-                    title="Translation Font Size"
-                  />
+
+                  {/* Translation Font Size Controls (Supports Extra Large Sizes) */}
+                  <div className="space-y-1.5 pt-1">
+                    <div className="flex items-center justify-between text-[11px] text-zinc-400">
+                      <span>Font Size</span>
+                      <div className="flex items-center gap-1">
+                        {[18, 22, 26, 32, 38, 44].map((sz) => (
+                          <button
+                            key={sz}
+                            type="button"
+                            onClick={() => onChange({ geetaTranslationFontSize: sz })}
+                            className={`px-1.5 py-0.5 rounded text-[10px] font-mono transition-all cursor-pointer border ${
+                              (config.geetaTranslationFontSize ?? 22) === sz
+                                ? 'bg-amber-400 text-black border-amber-300 font-bold scale-105'
+                                : 'bg-zinc-950 text-zinc-300 border-zinc-800 hover:text-white hover:bg-zinc-900'
+                            }`}
+                          >
+                            {sz}
+                          </button>
+                        ))}
+                      </div>
+                    </div>
+                    <input
+                      type="range"
+                      min="14"
+                      max="48"
+                      step="1"
+                      value={config.geetaTranslationFontSize ?? 22}
+                      onChange={(e) => onChange({ geetaTranslationFontSize: parseInt(e.target.value, 10) })}
+                      className="w-full accent-amber-400 cursor-pointer"
+                      title="Translation Font Size"
+                    />
+                    <div className="flex justify-between text-[10px] text-zinc-500">
+                      <span>Standard (18px)</span>
+                      <span>Medium (26px)</span>
+                      <span>Large (36px)</span>
+                      <span>Extra Large (48px)</span>
+                    </div>
+                  </div>
+
+                  {/* Translation Weight Selector */}
+                  <div className="pt-2 border-t border-zinc-800/80">
+                    <div className="flex items-center justify-between text-[11px] text-zinc-400 mb-1.5">
+                      <span>Translation Weight</span>
+                      <span className="text-white font-mono text-[10px]">{config.geetaTranslationWeight ?? 500}</span>
+                    </div>
+                    <div className="grid grid-cols-4 gap-1">
+                      {[
+                        { label: 'Regular', val: 400 },
+                        { label: 'Medium', val: 500 },
+                        { label: 'SemiBold', val: 600 },
+                        { label: 'Bold', val: 700 },
+                      ].map((wt) => (
+                        <button
+                          key={wt.val}
+                          type="button"
+                          onClick={() => onChange({ geetaTranslationWeight: wt.val })}
+                          className={`py-1 text-center rounded text-[11px] font-medium transition-all cursor-pointer border ${
+                            (config.geetaTranslationWeight ?? 500) === wt.val
+                              ? 'bg-white text-black border-white font-bold shadow'
+                              : 'bg-zinc-950 border-zinc-800 text-zinc-400 hover:text-white hover:bg-zinc-900'
+                          }`}
+                        >
+                          {wt.label}
+                        </button>
+                      ))}
+                    </div>
+                  </div>
                 </div>
 
                 {/* Dedicated Tile Background Color & Styling Section */}
@@ -1425,6 +1483,82 @@ export default function Sidebar({
                         className="w-7 h-7 rounded cursor-pointer border-0 bg-transparent"
                         title="Header Citation Color"
                       />
+                    </div>
+                  </div>
+                </div>
+
+                {/* Typography Sizes & Weights for Gita */}
+                <div className="pt-2 border-t border-zinc-800/80 space-y-3">
+                  <label className="text-xs font-semibold text-zinc-300 uppercase tracking-wider block">
+                    Sizes & Weights
+                  </label>
+
+                  {/* Translation Size */}
+                  <div>
+                    <div className="flex items-center justify-between text-[11px] text-zinc-400 mb-0.5">
+                      <span>Translation Size</span>
+                      <span className="text-white font-mono">{config.geetaTranslationFontSize ?? 22}px</span>
+                    </div>
+                    <input
+                      type="range"
+                      min="14"
+                      max="48"
+                      step="1"
+                      value={config.geetaTranslationFontSize ?? 22}
+                      onChange={(e) => onChange({ geetaTranslationFontSize: parseInt(e.target.value, 10) })}
+                      className="w-full accent-amber-400 cursor-pointer"
+                    />
+                    <div className="flex justify-between text-[10px] text-zinc-500">
+                      <span>14px</span>
+                      <span>26px</span>
+                      <span>36px</span>
+                      <span>48px</span>
+                    </div>
+                  </div>
+
+                  {/* Shloka Size */}
+                  <div>
+                    <div className="flex items-center justify-between text-[11px] text-zinc-400 mb-0.5">
+                      <span>Sanskrit Shloka Size</span>
+                      <span className="text-white font-mono">{config.geetaShlokaFontSize ?? 24}px</span>
+                    </div>
+                    <input
+                      type="range"
+                      min="18"
+                      max="38"
+                      step="1"
+                      value={config.geetaShlokaFontSize ?? 24}
+                      onChange={(e) => onChange({ geetaShlokaFontSize: parseInt(e.target.value, 10) })}
+                      className="w-full accent-amber-400 cursor-pointer"
+                    />
+                  </div>
+
+                  {/* Translation Weight */}
+                  <div>
+                    <div className="flex items-center justify-between text-[11px] text-zinc-400 mb-1">
+                      <span>Translation Weight</span>
+                      <span className="text-white font-mono text-[10px]">{config.geetaTranslationWeight ?? 500}</span>
+                    </div>
+                    <div className="grid grid-cols-4 gap-1">
+                      {[
+                        { label: 'Regular', val: 400 },
+                        { label: 'Medium', val: 500 },
+                        { label: 'SemiBold', val: 600 },
+                        { label: 'Bold', val: 700 },
+                      ].map((wt) => (
+                        <button
+                          key={wt.val}
+                          type="button"
+                          onClick={() => onChange({ geetaTranslationWeight: wt.val })}
+                          className={`py-1 text-center rounded text-[11px] font-medium transition-all cursor-pointer border ${
+                            (config.geetaTranslationWeight ?? 500) === wt.val
+                              ? 'bg-white text-black border-white font-bold shadow'
+                              : 'bg-zinc-950 border-zinc-800 text-zinc-400 hover:text-white hover:bg-zinc-900'
+                          }`}
+                        >
+                          {wt.label}
+                        </button>
+                      ))}
                     </div>
                   </div>
                 </div>

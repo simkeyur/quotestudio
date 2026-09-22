@@ -67,7 +67,8 @@ const PreviewCard = forwardRef(({ config }, ref) => {
     geetaShowTranslationTag = true,
     geetaBoxGap = 24,
     geetaShlokaFontSize = 24,
-    geetaTranslationFontSize = 18,
+    geetaTranslationFontSize = 22,
+    geetaTranslationWeight = 500,
     geetaShlokaFont = "'Noto Serif Devanagari', serif",
     geetaTranslationFont = "'Mukta Vaani', sans-serif",
     geetaShlokaColor,
@@ -419,8 +420,8 @@ const PreviewCard = forwardRef(({ config }, ref) => {
                 <div
                   style={{
                     fontFamily: geetaTranslationFont || fontFamily,
-                    fontWeight: fontWeight || 500,
-                    fontSize: `${geetaTranslationFontSize * 1.5}px`,
+                    fontWeight: geetaTranslationWeight || fontWeight || 500,
+                    fontSize: `${geetaTranslationFontSize * 1.55}px`,
                     lineHeight: 1.65,
                     textAlign: geetaTextAlign || 'center',
                     color: geetaTranslationColor || textColor,
